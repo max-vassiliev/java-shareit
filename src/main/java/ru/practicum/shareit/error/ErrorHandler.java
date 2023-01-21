@@ -31,7 +31,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException exception) {
         List<String> details = new ArrayList<>();
-        for(ObjectError error : exception.getBindingResult().getAllErrors()) {
+        for (ObjectError error : exception.getBindingResult().getAllErrors()) {
             details.add(error.getDefaultMessage());
         }
         log.warn("400: {}", details);
