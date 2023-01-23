@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -21,31 +20,31 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.getAllUsers().stream()
+    public List<UserDto> getAll() {
+        return userRepository.getAll().stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto getUserById(Long id) {
-        return UserMapper.toUserDto(userRepository.findUserById(id));
+    public UserDto getById(Long id) {
+        return UserMapper.toUserDto(userRepository.getById(id));
     }
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto create(UserDto userDto) {
         User user = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userRepository.saveUser(user));
+        return UserMapper.toUserDto(userRepository.save(user));
     }
 
     @Override
-    public UserDto updateUser(UserUpdateDto userDto) {
+    public UserDto update(UserDto userDto) {
         User userUpdate = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userRepository.updateUser(userUpdate));
+        return UserMapper.toUserDto(userRepository.update(userUpdate));
     }
 
     @Override
-    public void deleteUser(Long id) {
-        userRepository.deleteUser(id);
+    public void delete(Long id) {
+        userRepository.delete(id);
     }
 }

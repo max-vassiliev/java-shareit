@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.practicum.shareit.util.Create;
+import ru.practicum.shareit.util.Update;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -16,11 +18,11 @@ public class UserDto {
 
     private Long id;
 
-    @NotBlank(message = "Укажите имя или логин")
+    @NotBlank(groups = {Create.class}, message = "Укажите имя или логин")
     private String name;
 
-    @NotBlank(message = "Укажите адрес электронной почты")
-    @Email(message = "Проверьте написание адреса электронной почты")
+    @NotBlank(groups = {Create.class}, message = "Укажите адрес электронной почты")
+    @Email(groups = {Create.class, Update.class}, message = "Проверьте написание адреса электронной почты")
     private String email;
 
     public UserDto(Long id, String name, String email) {

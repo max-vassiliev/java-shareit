@@ -17,7 +17,6 @@ public class Item {
     private String name;
     private String description;
     private Boolean available;
-
     private Long ownerId;
     private User owner;
     private Long requestId;
@@ -40,11 +39,11 @@ public class Item {
         this.ownerId = ownerId;
     }
 
-    public boolean isNameNotNull(Item item) {
+    public static boolean isNameNotNull(Item item) {
         return item.getName() != null && !item.getName().isBlank();
     }
 
-    public boolean isDescriptionNotNull(Item item) {
+    public static boolean isDescriptionNotNull(Item item) {
         return item.getDescription() != null && !item.getDescription().isBlank();
     }
 }

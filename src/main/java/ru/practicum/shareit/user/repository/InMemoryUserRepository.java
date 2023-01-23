@@ -18,18 +18,18 @@ public class InMemoryUserRepository implements UserRepository {
     private final Map<String, Long> emails = new HashMap<>();
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public User findUserById(Long userId) {
+    public User getById(Long userId) {
         validateId(userId);
         return users.get(userId);
     }
 
     @Override
-    public User saveUser(User user) {
+    public User save(User user) {
         validateEmail(user.getEmail());
         user.setId(nextId++);
 
@@ -40,25 +40,23 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public User updateUser(User updatedUser) {
-        User user = findUserById(updatedUser.getId());
+    public User update(User updatedUser) {
+        User user = getById(updatedUser.getId());
 
-        if (updatedUser.isNameNotNull(updatedUser)) {
+        if (User.isNameNotNull(updatedUser)) {
             user.setName(updatedUser.getName());
         }
-        if (updatedUser.isEmailNotNull(updatedUser)) {
-            validateEmail(updatedUser.getEmail());
+        if (User.isEmailNotNull(updatedUser)) {
             updateEmail(user, updatedUser);
             user.setEmail(updatedUser.getEmail());
         }
 
-        users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public void deleteUser(Long userId) {
-        User user = findUserById(userId);
+    public void delete(Long userId) {
+        User user = getById(userId);
         emails.remove(user.getEmail());
         users.remove(userId);
     }

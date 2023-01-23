@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -11,11 +12,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.util.Create;
+import ru.practicum.shareit.util.Update;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -29,32 +30,32 @@ public class UserController {
     @GetMapping
     public List<UserDto> getAll() {
         log.info("GET /users");
-        return userService.getAllUsers();
+        return userService.getAll();
     }
 
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable Long id) {
+    public UserDto getById(@PathVariable Long id) {
         log.info("GET /users/{}", id);
-        return userService.getUserById(id);
+        return userService.getById(id);
     }
 
     @PostMapping
-    public UserDto createUser(@Valid @RequestBody UserDto userDto) {
+    public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
         log.info("POST /users | userDto: {}", userDto);
-        return userService.createUser(userDto);
+        return userService.create(userDto);
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId,
-                                   @RequestBody UserUpdateDto userDto) {
+    public UserDto update(@PathVariable Long userId,
+                          @Validated(Update.class) @RequestBody UserDto userDto) {
         log.info("PATCH /users | userId: {} | userDto: {}", userId, userDto);
         userDto.setId(userId);
-        return userService.updateUser(userDto);
+        return userService.update(userDto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         log.info("DELETE /users/{}", id);
-        userService.deleteUser(id);
+        userService.delete(id);
     }
 }

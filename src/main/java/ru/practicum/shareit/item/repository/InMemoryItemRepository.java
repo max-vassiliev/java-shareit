@@ -5,8 +5,6 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.error.exception.ForbiddenException;
 import ru.practicum.shareit.error.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +18,9 @@ public class InMemoryItemRepository implements ItemRepository {
 
     private Long nextId = 1L;
     private final Map<Long, Item> items = new HashMap<>();
-    private final UserRepository userRepository;
 
     @Override
-    public Item findItemById(Long itemId) {
+    public Item findById(Long itemId) {
         Item item = items.get(itemId);
         if (item == null) {
             throw new ValidationException("Не найдена вещь с ID " + itemId);
@@ -32,18 +29,14 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public List<Item> findUserItems(Long ownerId) {
-        User owner = userRepository.findUserById(ownerId);
-
-        if (owner.getUserItems().isEmpty()) return null;
-
-        return owner.getUserItems().stream()
-                .map(this::findItemById)
+    public List<Item> findAllByOwnerId(Long ownerId) {
+        return items.values().stream()
+                .filter(item -> ownerId.equals(item.getOwnerId()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Item> findItemsByKeyword(String keyword) {
+    public List<Item> findAllByKeyword(String keyword) {
         return items.values().stream()
                 .filter(Item::getAvailable)
                 .filter(item -> (item.getName().toLowerCase().contains(keyword) ||
@@ -52,34 +45,29 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public Item saveItem(Item item) {
-        User owner = userRepository.findUserById(item.getOwnerId());
-
+    public Item save(Item item) {
         item.setId(nextId++);
-        item.setOwner(owner);
-        owner.getUserItems().add(item.getId());
         items.put(item.getId(), item);
 
         return item;
     }
 
     @Override
-    public Item updateItem(Item updatedItem) {
-        Item item = findItemById(updatedItem.getId());
+    public Item update(Item updatedItem) {
+        Item item = findById(updatedItem.getId());
 
         validateOwnerOnUpdate(updatedItem, item);
 
-        if (updatedItem.isNameNotNull(updatedItem)) {
+        if (Item.isNameNotNull(updatedItem)) {
             item.setName(updatedItem.getName());
         }
-        if (updatedItem.isDescriptionNotNull(updatedItem)) {
+        if (Item.isDescriptionNotNull(updatedItem)) {
             item.setDescription(updatedItem.getDescription());
         }
         if (updatedItem.getAvailable() != null) {
             item.setAvailable(updatedItem.getAvailable());
         }
 
-        items.put(item.getId(), item);
         return item;
     }
 
