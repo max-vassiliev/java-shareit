@@ -2,14 +2,14 @@ package ru.practicum.shareit.item.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.error.exception.ForbiddenException;
 import ru.practicum.shareit.error.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Repository
@@ -18,6 +18,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     private Long nextId = 1L;
     private final Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
 
     @Override
     public Item findById(Long itemId) {
@@ -30,9 +31,7 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> findAllByOwnerId(Long ownerId) {
-        return items.values().stream()
-                .filter(item -> ownerId.equals(item.getOwnerId()))
-                .collect(Collectors.toList());
+        return userItemIndex.get(ownerId);
     }
 
     @Override
@@ -49,14 +48,15 @@ public class InMemoryItemRepository implements ItemRepository {
         item.setId(nextId++);
         items.put(item.getId(), item);
 
+        final List<Item> userItems = userItemIndex.computeIfAbsent(item.getOwnerId(), k -> new ArrayList<>());
+        userItems.add(item);
+
         return item;
     }
 
     @Override
     public Item update(Item updatedItem) {
         Item item = findById(updatedItem.getId());
-
-        validateOwnerOnUpdate(updatedItem, item);
 
         if (Item.isNameNotNull(updatedItem)) {
             item.setName(updatedItem.getName());
@@ -69,16 +69,5 @@ public class InMemoryItemRepository implements ItemRepository {
         }
 
         return item;
-    }
-
-
-    // ----------------------
-    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // ----------------------
-
-    private void validateOwnerOnUpdate(Item updatedItem, Item item) {
-        if (!Objects.equals(updatedItem.getOwnerId(), item.getOwner().getId())) {
-            throw new ForbiddenException("Вносить изменения может только владелец вещи");
-        }
     }
 }
