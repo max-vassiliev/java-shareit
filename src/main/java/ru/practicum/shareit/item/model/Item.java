@@ -3,47 +3,52 @@ package ru.practicum.shareit.item.model;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "items", schema = "public")
 @Getter
 @Setter
 @NoArgsConstructor
 public class Item {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
+
+    @Column(name = "description", length = 500, nullable = false)
     private String description;
-    private Boolean available;
-    private Long ownerId;
+
+    @Column(name = "is_available", nullable = false)
+    private Boolean isAvailable;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
     private User owner;
-    private Long requestId;
-    private ItemRequest request;
 
-    // при создании
-    public Item(String name, String description, Boolean available, Long ownerId) {
+    @javax.persistence.Transient
+    private List<Comment> comments = new ArrayList<>();
+
+
+    public Item(String name, String description, Boolean isAvailable) {
         this.name = name;
         this.description = description;
-        this.available = Objects.requireNonNullElse(available, true);
-        this.ownerId = ownerId;
-    }
-
-    // при обновлении
-    public Item(Long id, String name, String description, Boolean available, Long ownerId) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-        this.ownerId = ownerId;
-    }
-
-    public static boolean isNameNotNull(Item item) {
-        return item.getName() != null && !item.getName().isBlank();
-    }
-
-    public static boolean isDescriptionNotNull(Item item) {
-        return item.getDescription() != null && !item.getDescription().isBlank();
+        this.isAvailable = Objects.requireNonNullElse(isAvailable, true);
     }
 }

@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.util.Create;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -29,9 +31,10 @@ public class ItemController {
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@PathVariable Long itemId) {
+    public ItemDto getById(@RequestHeader(value = USER_ID_HEADER, required = false) Long userId,
+                           @PathVariable Long itemId) {
         log.info("GET /items/{}", itemId);
-        return itemService.getById(itemId);
+        return itemService.getByIdAndUserId(itemId, userId);
     }
 
     @GetMapping
@@ -52,6 +55,17 @@ public class ItemController {
         log.info("POST /items | ownerId: {} | itemDto: {}", ownerId, itemDto);
         itemDto.setOwnerId(ownerId);
         return itemService.save(itemDto);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader(USER_ID_HEADER) Long authorId,
+                                 @PathVariable Long itemId,
+                                 @Validated(Create.class) @RequestBody CommentDto commentDto) {
+        log.info("POST /items/{}/comment | authorId: {} | commentDto: {}", itemId, authorId, commentDto);
+        commentDto.setAuthorId(authorId);
+        commentDto.setItemId(itemId);
+        commentDto.setCreated(LocalDateTime.now());
+        return itemService.saveComment(commentDto);
     }
 
     @PatchMapping("/{itemId}")

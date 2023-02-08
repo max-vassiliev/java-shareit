@@ -7,11 +7,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.error.exception.ForbiddenException;
-import ru.practicum.shareit.error.model.ErrorResponse;
+import ru.practicum.shareit.error.exception.BookingStatusException;
 import ru.practicum.shareit.error.exception.ConflictException;
 import ru.practicum.shareit.error.exception.EntityNotFoundException;
+import ru.practicum.shareit.error.exception.ForbiddenException;
 import ru.practicum.shareit.error.exception.ValidationException;
+import ru.practicum.shareit.error.model.ErrorResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +23,16 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleCustomValidationException(final ValidationException exception) {
+    public ErrorResponse handleValidationException(final ValidationException exception) {
         log.warn("400: {}", exception.getMessage());
         return new ErrorResponse("400 - Validation Error", exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBookingStatusException(final BookingStatusException exception) {
+        log.warn("400: {}", exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
@@ -62,7 +70,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalException(final Throwable exception) {
-        log.warn("500: {}", exception.getMessage());
+        log.warn("500: {} | {}", exception.getMessage(), exception.getStackTrace());
         return new ErrorResponse("500 - Internal Server Error", exception.getMessage());
     }
 }

@@ -30,4 +30,12 @@ public class UserDto {
         this.name = name;
         this.email = email;
     }
+
+    public static boolean isNameNotNull(UserDto userDto) {
+        return userDto.getName() != null && !userDto.getName().isBlank();
+    }
+
+    public static boolean isEmailNotNull(UserDto userDto) {
+        return userDto.getEmail() != null && !userDto.getEmail().isBlank();
+    }
 }

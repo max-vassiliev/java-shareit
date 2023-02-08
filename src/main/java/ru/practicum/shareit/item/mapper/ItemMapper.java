@@ -13,9 +13,8 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable(),
-                item.getOwner().getId(),
-                item.getRequest() != null ? item.getRequest().getId() : null
+                item.getIsAvailable(),
+                item.getOwner().getId()
         );
     }
 
@@ -23,18 +22,7 @@ public class ItemMapper {
         return new Item(
                 itemDto.getName(),
                 itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getOwnerId()
-        );
-    }
-
-    public static Item toItemUpdate(ItemDto itemDto) {
-        return new Item(
-                itemDto.getId(),
-                itemDto.getName(),
-                itemDto.getDescription(),
-                itemDto.getAvailable(),
-                itemDto.getOwnerId()
+                itemDto.getAvailable()
         );
     }
 }
