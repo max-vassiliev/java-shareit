@@ -22,10 +22,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    protected final UserMapper userMapper;
+
     @Override
     public List<UserDto> getAll() {
         return userRepository.findAll().stream()
-                .map(UserMapper::toUserDto)
+                .map(userMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
@@ -34,15 +36,15 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Не найден пользователь с ID " + id, User.class));
 
-        return UserMapper.toUserDto(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
     @Transactional
     public UserDto create(UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
+        User user = userMapper.toUser(userDto);
         User savedUser = userRepository.save(user);
-        return UserMapper.toUserDto(savedUser);
+        return userMapper.toUserDto(savedUser);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class UserServiceImpl implements UserService {
                         "Не найден пользователь с ID " + userDto.getId(), User.class));
         updateFields(user, userDto);
 
-        return UserMapper.toUserDto(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override

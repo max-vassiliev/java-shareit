@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -16,7 +17,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "and b.item = :item " +
             "and b.start < :now " +
             "and b.status = 'APPROVED'")
-    List<Booking> findByBookerAndItemPast(User booker, Item item, LocalDateTime now);
+    List<Booking> findByBookerAndItemPast(@Param("booker") User booker,
+                                          @Param("item") Item item,
+                                          @Param("now") LocalDateTime now);
 
     @Query("select b from Booking as b " +
             "where b.booker = ?1 " +
@@ -57,38 +60,41 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b from Booking as b " +
             "where b.item in :ownerItems " +
             "order by b.start desc")
-    List<Booking> findAllByOwnerItems(List<Item> ownerItems);
+    List<Booking> findAllByOwnerItems(@Param("ownerItems") List<Item> ownerItems);
 
     @Query("select b from Booking as b " +
             "where b.item in :ownerItems " +
             "and b.status = 'WAITING' " +
             "order by b.start desc")
-    List<Booking> findAllByOwnerItemsWaiting(List<Item> ownerItems);
+    List<Booking> findAllByOwnerItemsWaiting(@Param("ownerItems") List<Item> ownerItems);
 
     @Query("select b from Booking as b " +
             "where b.item in :ownerItems " +
             "and b.status = 'REJECTED' " +
             "order by b.start desc")
-    List<Booking> findAllByOwnerItemsRejected(List<Item> ownerItems);
+    List<Booking> findAllByOwnerItemsRejected(@Param("ownerItems") List<Item> ownerItems);
 
     @Query("select b from Booking as b " +
             "where b.item in :ownerItems " +
             "and b.end < :now " +
             "order by b.start desc")
-    List<Booking> findAllByOwnerItemsPast(List<Item> ownerItems, LocalDateTime now);
+    List<Booking> findAllByOwnerItemsPast(@Param("ownerItems") List<Item> ownerItems,
+                                          @Param("now") LocalDateTime now);
 
     @Query("select b from Booking as b " +
             "where b.item in :ownerItems " +
             "and b.start < :now " +
             "and b.end > :now " +
             "order by b.start desc")
-    List<Booking> findAllByOwnerItemsCurrent(List<Item> ownerItems, LocalDateTime now);
+    List<Booking> findAllByOwnerItemsCurrent(@Param("ownerItems") List<Item> ownerItems,
+                                             @Param("now") LocalDateTime now);
 
     @Query("select b from Booking as b " +
             "where b.item in :ownerItems " +
             "and b.start > :now " +
             "order by b.start desc")
-    List<Booking> findAllByOwnerItemsFuture(List<Item> ownerItems, LocalDateTime now);
+    List<Booking> findAllByOwnerItemsFuture(@Param("ownerItems") List<Item> ownerItems,
+                                            @Param("now") LocalDateTime now);
 
     @Query("select booking from Booking booking " +
             "where booking.start in " +
@@ -97,7 +103,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where b.item.id in :itemId " +
             "and b.start <= :now) " +
             "and booking.item.id in :itemId")
-    Booking findLastByItemId(Long itemId, LocalDateTime now);
+    Booking findLastByItemId(@Param("itemId") Long itemId,
+                             @Param("now") LocalDateTime now);
 
     @Query(nativeQuery = true, value = "select * " +
             "from bookings as b " +
@@ -105,7 +112,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "and b.starts <= :now " +
             "group by b.id " +
             "having b.starts = max(b.starts)")
-    List<Booking> findLastByItemIds(List<Long> itemIds, LocalDateTime now);
+    List<Booking> findLastByItemIds(@Param("itemIds") List<Long> itemIds,
+                                    @Param("now") LocalDateTime now);
 
     @Query("select booking from Booking booking " +
             "where booking.start in " +
@@ -114,7 +122,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "where b.item.id in :itemId " +
             "and b.start > :now) " +
             "and booking.item.id in :itemId")
-    Booking findNextByItemId(Long itemId, LocalDateTime now);
+    Booking findNextByItemId(@Param("itemId") Long itemId,
+                             @Param("now") LocalDateTime now);
 
     @Query(nativeQuery = true, value = "select * " +
             "from bookings as b " +
@@ -122,7 +131,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "and b.starts > :now " +
             "group by b.id " +
             "having b.starts = min(b.starts)")
-    List<Booking> findNextByItemIds(List<Long> itemIds, LocalDateTime now);
+    List<Booking> findNextByItemIds(@Param("itemIds") List<Long> itemIds,
+                                    @Param("now") LocalDateTime now);
 
     @Query("select b from Booking b " +
             "where b.item.id = :itemId " +
@@ -130,5 +140,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "or b.end = :ends " +
             "or (b.start between :starts and :ends) " +
             "or (b.end between :starts and :ends))")
-    List<Booking> findOverlaps(Long itemId, LocalDateTime starts, LocalDateTime ends);
+    List<Booking> findOverlaps(@Param("itemId") Long itemId,
+                               @Param("starts") LocalDateTime starts,
+                               @Param("ends") LocalDateTime ends);
 }

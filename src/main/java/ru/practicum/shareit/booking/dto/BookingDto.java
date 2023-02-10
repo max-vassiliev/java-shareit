@@ -6,11 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.Create;
 
 import javax.validation.constraints.Future;
@@ -45,25 +41,4 @@ public class BookingDto {
 
     private BookingState status;
 
-
-    public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
-                      Long itemId, String itemName, Long bookerId, BookingState status) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.itemId = itemId;
-        this.itemName = itemName;
-        this.bookerId = bookerId;
-        this.status = status;
-    }
-
-    public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
-                       Item item, User booker, BookingState status) {
-        this.id = id;
-        this.start = start;
-        this.end = end;
-        this.item = ItemMapper.toItemDto(item);
-        this.booker = UserMapper.toUserDto(booker);
-        this.status = status;
-    }
 }

@@ -39,14 +39,6 @@ public class ItemDto {
     private List<CommentDto> comments;
 
 
-    public ItemDto(Long id, String name, String description, boolean available, Long ownerId) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.available = available;
-        this.ownerId = ownerId;
-    }
-
     public static boolean isNameNotNull(ItemDto itemDto) {
         return itemDto.getName() != null && !itemDto.getName().isBlank();
     }

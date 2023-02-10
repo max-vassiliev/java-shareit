@@ -41,10 +41,4 @@ public class Comment {
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
 
-    public Comment(String text, Item item, User author, LocalDateTime created) {
-        this.text = text;
-        this.item = item;
-        this.author = author;
-        this.created = created;
-    }
 }

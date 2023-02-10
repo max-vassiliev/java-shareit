@@ -1,32 +1,23 @@
 package ru.practicum.shareit.item.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CommentMapper {
+@Mapper(componentModel = "spring")
+public interface CommentMapper {
 
-    public static CommentDto toCommentDto(Comment comment) {
-        return new CommentDto(
-                comment.getId(),
-                comment.getText(),
-                comment.getItem().getId(),
-                comment.getAuthor().getId(),
-                comment.getAuthor().getName(),
-                comment.getCreated()
-        );
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "created", source = "created", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    Comment toComment(CommentDto commentDto);
 
-    public static Comment toCommentCreate(CommentDto commentDto, Item item, User author) {
-        return new Comment(
-                commentDto.getText(),
-                item,
-                author,
-                commentDto.getCreated()
-        );
-    }
+    @Mapping(target = "authorId", source = "author.id")
+    @Mapping(target = "authorName", source = "author.name")
+    @Mapping(target = "created", source = "created", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    CommentDto toCommentDto(Comment comment);
+
+
 }

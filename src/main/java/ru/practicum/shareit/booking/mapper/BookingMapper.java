@@ -1,46 +1,35 @@
 package ru.practicum.shareit.booking.mapper;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingState;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class BookingMapper {
+@Mapper(componentModel = "spring")
+public interface BookingMapper {
 
-    public static Booking toBookingCreate(BookingDto bookingDto, User booker, Item item) {
-        return new Booking(
-                bookingDto.getStart(),
-                bookingDto.getEnd(),
-                item,
-                booker,
-                BookingState.WAITING
-        );
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "start", source = "start", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "end", source = "end", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "booker", ignore = true)
+    @Mapping(target = "status", defaultValue = "WAITING")
+    Booking toBooking(BookingDto bookingDto);
 
-    public static BookingDto toBookingDtoLite(Booking booking) {
-        return new BookingDto(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getItem().getId(),
-                booking.getItem().getName(),
-                booking.getBooker().getId(),
-                booking.getStatus()
-        );
-    }
+    @Mapping(target = "start", source = "start", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "end", source = "end", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "bookerId", source = "booker.id")
+    @Mapping(target = "itemId", source = "item.id")
+    @Mapping(target = "itemName", source = "item.name")
+    BookingDto toBookingDto(Booking booking);
 
-    public static BookingDto toBookingDto(Booking booking) {
-        return new BookingDto(
-                booking.getId(),
-                booking.getStart(),
-                booking.getEnd(),
-                booking.getItem(),
-                booking.getBooker(),
-                booking.getStatus()
-        );
-    }
+    @Mapping(target = "start", source = "start", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "end", source = "end", dateFormat = "dd-MM-yyyy HH:mm:ss")
+    @Mapping(target = "itemId", source = "item.id")
+    @Mapping(target = "itemName", source = "item.name")
+    @Mapping(target = "bookerId", source = "booker.id")
+    @Mapping(target = "booker", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    BookingDto toBookingDtoLite(Booking booking);
+
 }

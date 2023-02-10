@@ -16,7 +16,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "items", schema = "public")
@@ -45,10 +44,4 @@ public class Item {
     @javax.persistence.Transient
     private List<Comment> comments = new ArrayList<>();
 
-
-    public Item(String name, String description, Boolean isAvailable) {
-        this.name = name;
-        this.description = description;
-        this.isAvailable = Objects.requireNonNullElse(isAvailable, true);
-    }
 }

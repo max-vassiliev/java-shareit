@@ -28,13 +28,4 @@ public class CommentDto {
 
     private LocalDateTime created;
 
-
-    public CommentDto(Long id, String text, Long itemId, Long authorId, String authorName, LocalDateTime created) {
-        this.id = id;
-        this.text = text;
-        this.itemId = itemId;
-        this.authorId = authorId;
-        this.authorName = authorName;
-        this.created = created;
-    }
 }

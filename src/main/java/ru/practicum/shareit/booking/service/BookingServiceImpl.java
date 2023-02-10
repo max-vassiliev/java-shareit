@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-
+    private final BookingMapper bookingMapper;
 
     @Override
     public BookingDto getById(Long bookingId, Long userId) {
@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
         getUser(userId);
 
         if (isUserAuthorized(userId, booking)) {
-            return BookingMapper.toBookingDto(booking);
+            return bookingMapper.toBookingDto(booking);
         } else {
             throw new EntityNotFoundException("Бронирование не найдено",
                     Booking.class);
@@ -55,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
         if (foundBookings.isEmpty()) return Collections.emptyList();
 
         return foundBookings.stream()
-                .map(BookingMapper::toBookingDto)
+                .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
         if (foundBookings.isEmpty()) return Collections.emptyList();
 
         return foundBookings.stream()
-                .map(BookingMapper::toBookingDto)
+                .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
@@ -79,9 +79,12 @@ public class BookingServiceImpl implements BookingService {
         User booker = getUser(bookingDto.getBookerId());
         Item item = getItem(bookingDto.getItemId());
         validateBeforeCreate(item, bookingDto, booker);
-        Booking booking = BookingMapper.toBookingCreate(bookingDto, booker, item);
 
-        return BookingMapper.toBookingDto(bookingRepository.save(booking));
+        Booking booking = bookingMapper.toBooking(bookingDto);
+        booking.setBooker(booker);
+        booking.setItem(item);
+
+        return bookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
@@ -96,7 +99,7 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(BookingState.REJECTED);
         }
 
-        return BookingMapper.toBookingDto(booking);
+        return bookingMapper.toBookingDto(booking);
     }
 
 

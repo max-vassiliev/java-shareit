@@ -30,6 +30,7 @@ public class ItemController {
     private final ItemService itemService;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
+
     @GetMapping("/{itemId}")
     public ItemDto getById(@RequestHeader(value = USER_ID_HEADER, required = false) Long userId,
                            @PathVariable Long itemId) {
