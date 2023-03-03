@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
-import ru.practicum.shareit.error.exception.BookingStatusException;
+import ru.practicum.shareit.common.exception.BookingStatusException;
 
 public enum BookingStateDto {
     WAITING,
