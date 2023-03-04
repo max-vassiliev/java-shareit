@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.error.exception.EntityNotFoundException;
-import ru.practicum.shareit.error.exception.ValidationException;
+import ru.practicum.shareit.common.exception.EntityNotFoundException;
+import ru.practicum.shareit.common.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
@@ -19,6 +19,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto saveComment(CommentDto commentDto) {
         User author = getUser(commentDto.getAuthorId());
         Item item = getItem(commentDto.getItemId());
+        commentDto.setCreated(LocalDateTime.now());
         validateAuthorForComment(author, item, commentDto.getCreated());
 
         Comment comment = commentMapper.toComment(commentDto);
@@ -52,7 +54,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void getComments(ItemDto itemDto) {
         List<Comment> comments = commentRepository.findAllByItem_Id(itemDto.getId());
-        itemDto.setComments(new ArrayList<>());
 
         comments.stream()
                 .map(commentMapper::toCommentDto)
@@ -62,18 +63,21 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void getComments(List<ItemDto> itemDtos, List<Long> itemIds) {
         List<Comment> comments = commentRepository.findAllByItemIds(itemIds);
+        if (comments.isEmpty()) return;
+
         Map<Long, List<CommentDto>> itemComments = new HashMap<>();
 
         comments.forEach(comment -> itemComments
                 .computeIfAbsent(comment.getItem().getId(), (commentList -> new ArrayList<>()))
                 .add(commentMapper.toCommentDto(comment)));
-        itemDtos.forEach(itemDto -> itemDto.setComments(itemComments.get(itemDto.getId())));
+
+        itemDtos.forEach(itemDto -> itemDto.setComments(
+                itemComments.getOrDefault(itemDto.getId(), Collections.emptyList())));
     }
 
-
-    // ----------------------
-    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // ----------------------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
 
     private User getUser(Long userId) {
         return userRepository.findById(userId)

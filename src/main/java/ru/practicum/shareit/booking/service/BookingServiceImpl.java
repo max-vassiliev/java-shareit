@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -10,9 +11,9 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.error.exception.ConflictException;
-import ru.practicum.shareit.error.exception.EntityNotFoundException;
-import ru.practicum.shareit.error.exception.ValidationException;
+import ru.practicum.shareit.common.exception.ConflictException;
+import ru.practicum.shareit.common.exception.EntityNotFoundException;
+import ru.practicum.shareit.common.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -48,10 +49,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByBookerId(Long bookerId, String state) {
+    public List<BookingDto> getAllByBookerId(Long bookerId, String state, Pageable pageable) {
         User booker = getUser(bookerId);
         BookingStateDto stateDto = BookingStateDto.fromString(state);
-        List<Booking> foundBookings = findByBookerAndState(booker, stateDto);
+        List<Booking> foundBookings = findByBookerAndState(booker, stateDto, pageable);
         if (foundBookings.isEmpty()) return Collections.emptyList();
 
         return foundBookings.stream()
@@ -60,15 +61,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByOwnerId(Long ownerId, String state) {
+    public List<BookingDto> getAllByOwnerId(Long ownerId, String state, Pageable pageable) {
         getUser(ownerId);
-        List<Item> ownerItems = getItemsByOwnerId(ownerId);
         BookingStateDto stateDto = BookingStateDto.fromString(state);
 
-        List<Booking> foundBookings = findByOwnerItemsAndState(ownerItems, stateDto);
-        if (foundBookings.isEmpty()) return Collections.emptyList();
+        List<Booking> bookings = findByOwnerIdAndState(ownerId, stateDto, pageable);
+        if (bookings.isEmpty()) return Collections.emptyList();
 
-        return foundBookings.stream()
+        return bookings.stream()
                 .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
@@ -103,9 +103,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-    // ----------------------
-    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // ----------------------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
 
     private Booking getBooking(Long bookingId) {
         return bookingRepository.findById(bookingId)
@@ -128,62 +128,53 @@ public class BookingServiceImpl implements BookingService {
                 ));
     }
 
-    private List<Item> getItemsByOwnerId(Long ownerId) {
-        List<Item> ownerItems = itemRepository.findByOwnerId(ownerId);
-        if (ownerItems.isEmpty()) {
-            throw new ValidationException("У пользователя с ID " + ownerId + " пока нет вещей для бронирования");
-        }
-        return ownerItems;
-    }
-
-    List<Booking> findByBookerAndState(User booker, BookingStateDto stateDto) {
+    List<Booking> findByBookerAndState(User booker, BookingStateDto stateDto, Pageable pageable) {
         List<Booking> foundBookings;
 
         switch (stateDto) {
             case PAST:
-                foundBookings = bookingRepository.findAllByBookerPast(booker,LocalDateTime.now());
+                foundBookings = bookingRepository.findAllByBookerPast(booker, LocalDateTime.now(), pageable);
                 break;
             case CURRENT:
-                foundBookings = bookingRepository.findAllByBookerCurrent(booker, LocalDateTime.now());
+                foundBookings = bookingRepository.findAllByBookerCurrent(booker, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                foundBookings = bookingRepository.findAllByBookerFuture(booker, LocalDateTime.now());
+                foundBookings = bookingRepository.findAllByBookerFuture(booker, LocalDateTime.now(), pageable);
                 break;
             case WAITING:
-                foundBookings = bookingRepository.findAllByBookerWaiting(booker);
+                foundBookings = bookingRepository.findAllByBookerWaiting(booker, pageable);
                 break;
             case REJECTED:
-                foundBookings = bookingRepository.findAllByBookerRejected(booker);
+                foundBookings = bookingRepository.findAllByBookerRejected(booker, pageable);
                 break;
             default:
-                foundBookings = bookingRepository.findAllByBooker(booker);
+                foundBookings = bookingRepository.findAllByBooker(booker, pageable);
         }
 
         return foundBookings;
     }
 
-
-    private List<Booking> findByOwnerItemsAndState(List<Item> ownerItems, BookingStateDto stateDto) {
+    private List<Booking> findByOwnerIdAndState(Long ownerId, BookingStateDto stateDto, Pageable pageable) {
         List<Booking> foundBookings;
 
         switch (stateDto) {
             case PAST:
-                foundBookings = bookingRepository.findAllByOwnerItemsPast(ownerItems, LocalDateTime.now());
+                foundBookings = bookingRepository.findByOwnerIdPast(ownerId, LocalDateTime.now(), pageable);
                 break;
             case CURRENT:
-                foundBookings = bookingRepository.findAllByOwnerItemsCurrent(ownerItems, LocalDateTime.now());
+                foundBookings = bookingRepository.findByOwnerIdCurrent(ownerId, LocalDateTime.now(), pageable);
                 break;
             case FUTURE:
-                foundBookings = bookingRepository.findAllByOwnerItemsFuture(ownerItems, LocalDateTime.now());
+                foundBookings = bookingRepository.findByOwnerIdFuture(ownerId, LocalDateTime.now(), pageable);
                 break;
             case WAITING:
-                foundBookings = bookingRepository.findAllByOwnerItemsWaiting(ownerItems);
+                foundBookings = bookingRepository.findByOwnerIdWaiting(ownerId, pageable);
                 break;
             case REJECTED:
-                foundBookings = bookingRepository.findAllByOwnerItemsRejected(ownerItems);
+                foundBookings = bookingRepository.findByOwnerIdRejected(ownerId, pageable);
                 break;
             default:
-                foundBookings = bookingRepository.findAllByOwnerItems(ownerItems);
+                foundBookings = bookingRepository.findByOwnerId(ownerId, pageable);
         }
 
         return foundBookings;
@@ -220,10 +211,7 @@ public class BookingServiceImpl implements BookingService {
         if (BookingState.APPROVED.equals(booking.getStatus()) || BookingState.REJECTED.equals(booking.getStatus())) {
             throw new ValidationException("Менять статус этого бронирования уже нельзя");
         }
-        userRepository.findById(ownerId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Не найден пользователь с ID " + ownerId, User.class
-                ));
+        getUser(ownerId);
         if (Objects.equals(ownerId, booking.getBooker().getId())) {
             throw new EntityNotFoundException("Подтверждать бронирование может только владелец вещи", Booking.class);
         }

@@ -7,7 +7,7 @@ import lombok.ToString;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.util.Create;
+import ru.practicum.shareit.common.Create;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.FutureOrPresent;

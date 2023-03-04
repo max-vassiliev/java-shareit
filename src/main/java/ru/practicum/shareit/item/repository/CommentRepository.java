@@ -15,5 +15,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "where c.item.id in :itemIds")
     List<Comment> findAllByItemIds(@Param("itemIds") List<Long> itemIds);
 
-
 }

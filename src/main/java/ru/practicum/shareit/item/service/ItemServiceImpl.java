@@ -1,20 +1,23 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.error.exception.EntityNotFoundException;
-import ru.practicum.shareit.error.exception.ForbiddenException;
-import ru.practicum.shareit.error.exception.ValidationException;
+import ru.practicum.shareit.common.exception.EntityNotFoundException;
+import ru.practicum.shareit.common.exception.ForbiddenException;
+import ru.practicum.shareit.common.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -34,9 +37,11 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final ItemRequestRepository requestRepository;
     private final CommentService commentService;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
+
 
     @Override
     public ItemDto getByIdAndUserId(Long itemId, Long userId) {
@@ -51,8 +56,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByOwnerId(Long ownerId) {
-        List<Item> userItems = itemRepository.findByOwnerIdOrderById(ownerId);
+    public List<ItemDto> getAllByOwnerId(Long ownerId, Pageable pageable) {
+        getUser(ownerId);
+        List<Item> userItems = itemRepository.findByOwnerId(ownerId, pageable);
         if (userItems == null) return Collections.emptyList();
 
         List<ItemDto> userItemDtos = userItems.stream()
@@ -68,10 +74,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getAllByKeyword(String keyword) {
-        if (keyword.isBlank()) return Collections.emptyList();
+    public List<ItemDto> getAllByKeyword(String keyword, Pageable pageable) {
+        if (keyword.isEmpty()) return Collections.emptyList();
 
-        return itemRepository.searchByKeyword(keyword.toUpperCase())
+        return itemRepository.searchByKeyword(keyword, pageable)
                 .stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -80,10 +86,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto save(ItemDto itemDto) {
-        validateOwnerId(itemDto.getOwnerId());
         User owner = getUser(itemDto.getOwnerId());
         Item item = itemMapper.toItem(itemDto);
         item.setOwner(owner);
+        setItemRequest(itemDto, item);
 
         return itemMapper.toItemDto(itemRepository.save(item));
     }
@@ -91,10 +97,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDto update(ItemDto itemDto) {
-        validateOwnerId(itemDto.getOwnerId());
-        Item item = itemRepository.findById(itemDto.getId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Не найдена вещь с ID " + itemDto.getId(), Item.class));
+        Item item = getItem(itemDto.getId());
         validateOwnerOnUpdate(itemDto, item);
         updateFields(item, itemDto);
 
@@ -108,9 +111,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    // ----------------------
-    // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-    // ----------------------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
 
     private Item getItem(Long itemId) {
         return itemRepository.findById(itemId)
@@ -126,11 +129,18 @@ public class ItemServiceImpl implements ItemService {
                 ));
     }
 
-    private void validateOwnerId(Long ownerId) {
-        if (ownerId <= 0) {
-            throw new ValidationException("Идентификатор владельца должен быть положительным числом. " +
-                    "Передан ID: " + ownerId);
+    private void setItemRequest(ItemDto itemDto, Item item) {
+        if (itemDto.getRequestId() == null) return;
+
+        ItemRequest request = requestRepository.findById(itemDto.getRequestId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Не найден запрос с ID " + itemDto.getRequestId(), ItemRequest.class
+                ));
+        if (itemDto.getOwnerId().equals(request.getRequestor().getId())) {
+            throw new ValidationException("Владелец вещи не может отвечать на собственный запрос");
         }
+
+        item.setRequest(request);
     }
 
     private void validateOwnerOnUpdate(ItemDto updatedItem, Item item) {

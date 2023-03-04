@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,14 +16,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.util.Create;
+import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.CustomPageRequest;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Validated
 @Slf4j
 public class BookingController {
 
@@ -39,16 +44,22 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingDto> getAllByBookerId(@RequestHeader(USER_ID_HEADER) Long bookerId,
-                                             @RequestParam(defaultValue = "all") String state) {
-        log.info("GET /bookings?state={} | bookerId: {}", state, bookerId);
-        return bookingService.getAllByBookerId(bookerId, state);
+            @RequestParam(name = "state", defaultValue = "all") String state,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("GET /bookings?state={}&from={}&size={} | bookerId: {}", state, from, size, bookerId);
+        return bookingService.getAllByBookerId(bookerId, state,
+                new CustomPageRequest(from, size, Sort.by(Sort.Direction.DESC, "start")));
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllByOwnerId(@RequestHeader(USER_ID_HEADER) Long ownerId,
-                                            @RequestParam(defaultValue = "all") String state) {
-        log.info("GET /bookings/owner?state={state}");
-        return bookingService.getAllByOwnerId(ownerId, state);
+            @RequestParam(name = "state", defaultValue = "all") String state,
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("GET /bookings/owner?state={}&from={}&size={} | ownerId: {}", state, from, size, ownerId);
+        return bookingService.getAllByOwnerId(ownerId, state,
+                new CustomPageRequest(from, size, Sort.by(Sort.Direction.DESC, "start")));
     }
 
     @PostMapping

@@ -1,15 +1,13 @@
 package ru.practicum.shareit.item.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.util.Create;
+import ru.practicum.shareit.common.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -36,14 +34,16 @@ public class ItemDto {
 
     private BookingDto nextBooking;
 
-    private List<CommentDto> comments;
+    private Long requestId;
+
+    private List<CommentDto> comments = new ArrayList<>();
 
 
     public static boolean isNameNotNull(ItemDto itemDto) {
-        return itemDto.getName() != null && !itemDto.getName().isBlank();
+        return itemDto.getName() != null && !itemDto.getName().isEmpty();
     }
 
     public static boolean isDescriptionNotNull(ItemDto itemDto) {
-        return itemDto.getDescription() != null && !itemDto.getDescription().isBlank();
+        return itemDto.getDescription() != null && !itemDto.getDescription().isEmpty();
     }
 }
