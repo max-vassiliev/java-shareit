@@ -275,7 +275,7 @@ class ItemRequestServiceImplTest {
         verify(itemRepository, times(1))
                 .findAllByRequestIds(anyList());
     }
-    
+
     @Test
     void getAllByRequestorId_whenValidAndRequestsWithoutItems_thenDtosWithoutItemsReturned() {
         int expectedRequests = 2;

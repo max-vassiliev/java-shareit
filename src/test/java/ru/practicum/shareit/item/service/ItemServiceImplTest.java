@@ -317,7 +317,6 @@ class ItemServiceImplTest {
         checkFields(items, outputDtos);
     }
 
-    
     @Test
     void getAllByKeyword_whenValid_thenDtosReturned() {
         String keyword = "keYwOrd";
