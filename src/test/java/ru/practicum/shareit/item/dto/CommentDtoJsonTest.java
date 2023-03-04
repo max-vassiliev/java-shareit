@@ -40,7 +40,6 @@ class CommentDtoJsonTest {
                 .isEqualTo(commentDto.getCreated().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }
 
-
     @Test
     @SneakyThrows
     void deserializeToCommentDto() {

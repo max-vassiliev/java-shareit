@@ -64,7 +64,7 @@ class ItemServiceImplTest {
     private CommentService commentService;
 
     @InjectMocks
-    ItemServiceImpl itemService;
+    private ItemServiceImpl itemService;
 
     @Spy
     private final ItemMapper itemMapper = Mappers.getMapper(ItemMapper.class);
@@ -90,10 +90,8 @@ class ItemServiceImplTest {
 
         ItemDto outputDto = itemService.save(inputDto);
 
-        assertEquals(outputDto.getId(), expectedId);
-        assertEquals(outputDto.getName(), inputDto.getName());
-        assertEquals(outputDto.getDescription(), inputDto.getDescription());
-        assertEquals(outputDto.getAvailable(), inputDto.getAvailable());
+        assertEquals(expectedId, outputDto.getId());
+        checkFields(inputDto, outputDto);
     }
 
     @Test
@@ -116,11 +114,9 @@ class ItemServiceImplTest {
 
         ItemDto outputDto = itemService.save(inputDto);
 
-        assertEquals(outputDto.getId(), expectedId);
-        assertEquals(outputDto.getName(), inputDto.getName());
-        assertEquals(outputDto.getDescription(), inputDto.getDescription());
-        assertEquals(outputDto.getAvailable(), inputDto.getAvailable());
-        assertEquals(outputDto.getRequestId(), inputDto.getRequestId());
+        assertEquals(expectedId, outputDto.getId());
+        assertEquals(inputDto.getRequestId(), outputDto.getRequestId());
+        checkFields(inputDto, outputDto);
     }
 
     @Test
@@ -166,9 +162,7 @@ class ItemServiceImplTest {
 
         ItemDto outputDto = itemService.update(inputDto);
         assertEquals(outputDto.getId(), inputDto.getId());
-        assertEquals(outputDto.getName(), inputDto.getName());
-        assertEquals(outputDto.getDescription(), inputDto.getDescription());
-        assertEquals(outputDto.getAvailable(), inputDto.getAvailable());
+        checkFields(inputDto, outputDto);
     }
 
     @Test
@@ -270,11 +264,11 @@ class ItemServiceImplTest {
 
         ItemDto outputDto = itemService.getByIdAndUserId(itemId, ownerId);
 
-        assertEquals(outputDto.getId(), itemId);
-        assertNotNull(outputDto.getName());
-        assertNotNull(outputDto.getDescription());
-        assertNotNull(outputDto.getAvailable());
+        assertEquals(itemId, outputDto.getId());
+        checkFieldsNotNull(outputDto);
     }
+
+
 
     @Test
     void getByIdAndUserId_whenUserNotOwner_thenDtoReturned() {
@@ -290,10 +284,8 @@ class ItemServiceImplTest {
 
         ItemDto outputDto = itemService.getByIdAndUserId(itemId, otherUserId);
 
-        assertEquals(outputDto.getId(), itemId);
-        assertNotNull(outputDto.getName());
-        assertNotNull(outputDto.getDescription());
-        assertNotNull(outputDto.getAvailable());
+        assertEquals(itemId, outputDto.getId());
+        checkFieldsNotNull(outputDto);
     }
 
     @Test
@@ -322,17 +314,10 @@ class ItemServiceImplTest {
 
         List<ItemDto> outputDtos = itemService.getAllByOwnerId(ownerId, defaultPageable);
         assertEquals(outputDtos.size(), items.size());
-        assertEquals(outputDtos.get(0).getId(), items.get(0).getId());
-        assertEquals(outputDtos.get(0).getName(), items.get(0).getName());
-        assertEquals(outputDtos.get(0).getDescription(), items.get(0).getDescription());
-        assertEquals(outputDtos.get(1).getId(), items.get(1).getId());
-        assertEquals(outputDtos.get(1).getName(), items.get(1).getName());
-        assertEquals(outputDtos.get(1).getDescription(), items.get(1).getDescription());
-        assertEquals(outputDtos.get(2).getId(), items.get(2).getId());
-        assertEquals(outputDtos.get(2).getName(), items.get(2).getName());
-        assertEquals(outputDtos.get(2).getDescription(), items.get(2).getDescription());
+        checkFields(items, outputDtos);
     }
 
+    
     @Test
     void getAllByKeyword_whenValid_thenDtosReturned() {
         String keyword = "keYwOrd";
@@ -345,13 +330,7 @@ class ItemServiceImplTest {
 
         List<ItemDto> outputDtos = itemService.getAllByKeyword(keyword, defaultPageable);
         assertEquals(outputDtos.size(), relevantItems.size());
-        assertEquals(outputDtos.get(0).getId(), relevantItems.get(0).getId());
-        assertEquals(outputDtos.get(0).getName(), relevantItems.get(0).getName());
-        assertEquals(outputDtos.get(0).getDescription(), relevantItems.get(0).getDescription());
-
-        assertEquals(outputDtos.get(1).getId(), relevantItems.get(1).getId());
-        assertEquals(outputDtos.get(1).getName(), relevantItems.get(1).getName());
-        assertEquals(outputDtos.get(1).getDescription(), relevantItems.get(1).getDescription());
+        checkFields(relevantItems, outputDtos);
     }
 
     @Test
@@ -401,14 +380,8 @@ class ItemServiceImplTest {
 
         assertNotNull(outputDto.getLastBooking());
         assertNotNull(outputDto.getNextBooking());
-        assertEquals(lastBooking.getId(), outputDto.getLastBooking().getId());
-        assertEquals(lastBooking.getItem().getId(), item.getId());
-        assertEquals(lastBooking.getItem().getId(), outputDto.getLastBooking().getItemId());
-        assertEquals(lastBooking.getBooker().getId(), outputDto.getLastBooking().getBookerId());
-        assertEquals(nextBooking.getId(), outputDto.getNextBooking().getId());
-        assertEquals(nextBooking.getItem().getId(), item.getId());
-        assertEquals(nextBooking.getItem().getId(), outputDto.getNextBooking().getItemId());
-        assertEquals(nextBooking.getBooker().getId(), outputDto.getNextBooking().getBookerId());
+        checkFields(lastBooking, outputDto, true);
+        checkFields(nextBooking, outputDto, false);
     }
 
     @Test
@@ -457,17 +430,12 @@ class ItemServiceImplTest {
                 .thenReturn(new ArrayList<>(Collections.singletonList(nextBookingItem1)));
 
         List<ItemDto> outputDtos = itemService.getAllByOwnerId(owner.getId(), defaultPageable);
+
         assertEquals(outputDtos.size(), items.size());
-
         assertNotNull(outputDtos.get(0).getLastBooking());
-        assertEquals(outputDtos.get(0).getId(), outputDtos.get(0).getLastBooking().getItemId());
-        assertEquals(lastBookingItem1.getId(), outputDtos.get(0).getLastBooking().getId());
-        assertEquals(lastBookingItem1.getBooker().getId(), outputDtos.get(0).getLastBooking().getBookerId());
-
         assertNotNull(outputDtos.get(0).getNextBooking());
-        assertEquals(outputDtos.get(0).getId(), outputDtos.get(0).getNextBooking().getItemId());
-        assertEquals(nextBookingItem1.getId(), outputDtos.get(0).getNextBooking().getId());
-        assertEquals(nextBookingItem1.getBooker().getId(), outputDtos.get(0).getNextBooking().getBookerId());
+        checkFields(lastBookingItem1, outputDtos.get(0), true);
+        checkFields(nextBookingItem1, outputDtos.get(0), false);
     }
 
     @Test
@@ -553,14 +521,8 @@ class ItemServiceImplTest {
 
         assertNotNull(outputDto.getLastBooking());
         assertNotNull(outputDto.getNextBooking());
-        assertEquals(lastBooking.getId(), outputDto.getLastBooking().getId());
-        assertEquals(lastBooking.getItem().getId(), item.getId());
-        assertEquals(lastBooking.getItem().getId(), outputDto.getLastBooking().getItemId());
-        assertEquals(lastBooking.getBooker().getId(), outputDto.getLastBooking().getBookerId());
-        assertEquals(nextBooking.getId(), outputDto.getNextBooking().getId());
-        assertEquals(nextBooking.getItem().getId(), item.getId());
-        assertEquals(nextBooking.getItem().getId(), outputDto.getNextBooking().getItemId());
-        assertEquals(nextBooking.getBooker().getId(), outputDto.getNextBooking().getBookerId());
+        checkFields(lastBooking, outputDto, true);
+        checkFields(nextBooking, outputDto, false);
 
         verify(commentService, times(1)).getComments(any());
     }
@@ -598,22 +560,53 @@ class ItemServiceImplTest {
         assertEquals(outputDtos.size(), items.size());
 
         assertNotNull(outputDtos.get(0).getLastBooking());
-        assertEquals(outputDtos.get(0).getId(), outputDtos.get(0).getLastBooking().getItemId());
-        assertEquals(lastBookingItem1.getId(), outputDtos.get(0).getLastBooking().getId());
-        assertEquals(lastBookingItem1.getBooker().getId(), outputDtos.get(0).getLastBooking().getBookerId());
-
         assertNotNull(outputDtos.get(0).getNextBooking());
+        assertEquals(outputDtos.get(0).getId(), outputDtos.get(0).getLastBooking().getItemId());
         assertEquals(outputDtos.get(0).getId(), outputDtos.get(0).getNextBooking().getItemId());
-        assertEquals(nextBookingItem1.getId(), outputDtos.get(0).getNextBooking().getId());
-        assertEquals(nextBookingItem1.getBooker().getId(), outputDtos.get(0).getNextBooking().getBookerId());
+        checkFields(lastBookingItem1, outputDtos.get(0), true);
+        checkFields(nextBookingItem1, outputDtos.get(0), false);
 
         verify(commentService, times(1)).getComments(any(), any());
     }
 
 
-    // ----------
-    // Шаблоны
-    // ----------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
+
+    private void checkFields(ItemDto inputDto, ItemDto outputDto) {
+        assertEquals(inputDto.getName(), outputDto.getName());
+        assertEquals(inputDto.getDescription(), outputDto.getDescription());
+        assertEquals(inputDto.getAvailable(), outputDto.getAvailable());
+    }
+
+    private void checkFields(List<Item> items, List<ItemDto> itemDtos) {
+        for (int i = 0; i < itemDtos.size(); i++) {
+            assertEquals(items.get(i).getId(), itemDtos.get(i).getId());
+            assertEquals(items.get(i).getName(), itemDtos.get(i).getName());
+            assertEquals(items.get(i).getDescription(), itemDtos.get(i).getDescription());
+            assertEquals(items.get(i).getIsAvailable(), itemDtos.get(i).getAvailable());
+        }
+    }
+
+    private void checkFields(Booking booking, ItemDto itemDto, boolean isLastBooking) {
+        assertEquals(booking.getItem().getId(), itemDto.getId());
+        if (isLastBooking) {
+            assertEquals(booking.getId(), itemDto.getLastBooking().getId());
+            assertEquals(booking.getItem().getId(), itemDto.getLastBooking().getItemId());
+            assertEquals(booking.getBooker().getId(), itemDto.getLastBooking().getBookerId());
+        } else {
+            assertEquals(booking.getId(), itemDto.getNextBooking().getId());
+            assertEquals(booking.getItem().getId(), itemDto.getNextBooking().getItemId());
+            assertEquals(booking.getBooker().getId(), itemDto.getNextBooking().getBookerId());
+        }
+    }
+
+    private void checkFieldsNotNull(ItemDto itemDto) {
+        assertNotNull(itemDto.getName());
+        assertNotNull(itemDto.getDescription());
+        assertNotNull(itemDto.getAvailable());
+    }
 
     private ItemDto createItemDto() {
         ItemDto itemDto = new ItemDto();

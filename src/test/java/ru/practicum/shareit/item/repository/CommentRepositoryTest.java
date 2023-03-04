@@ -24,30 +24,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CommentRepositoryTest {
 
     @Autowired
-    CommentRepository commentRepository;
+    private CommentRepository commentRepository;
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
-    User owner;
-    User author1;
-    User author2;
+    private Item item1;
 
-    Item item1;
-    Item item2;
+    private Item item2;
 
-    Comment comment1;
-    Comment comment2;
-    Comment comment3;
+    private Comment comment1;
+
+    private Comment comment2;
+
+    private Comment comment3;
+
 
     @BeforeEach
     void setUp() {
-        owner = userRepository.save(createUser("Peter", "peter@example.com"));
-        author1 = userRepository.save(createUser("Kate", "kate@example.com"));
-        author2 = userRepository.save(createUser("Paul", "paul@example.com"));
+        User owner = userRepository.save(createUser("Peter", "peter@example.com"));
+        User author1 = userRepository.save(createUser("Kate", "kate@example.com"));
+        User author2 = userRepository.save(createUser("Paul", "paul@example.com"));
 
         item1 = itemRepository.save(createItem(owner, "Peter's Item 1",
                 "Peter's Item 1 Description"));

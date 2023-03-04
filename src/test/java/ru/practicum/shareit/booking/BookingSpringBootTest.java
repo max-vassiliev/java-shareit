@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class BookingControllerSpringBootTest {
+class BookingSpringBootTest {
 
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
@@ -44,31 +44,29 @@ class BookingControllerSpringBootTest {
     @Autowired
     private MockMvc mvc;
 
-    Booking booking1;
-    Booking booking2;
-    Booking booking3;
-    Booking booking4;
+    private Booking booking1;
 
-    User user1;
-    User user2;
-    User user3;
+    private Booking booking2;
 
-    Item item1;
-    Item item2;
-    Item item3;
+    private Booking booking3;
+
+    private Booking booking4;
+
+    private User user1;
+
+    private User user2;
+
 
     @BeforeEach
     public void setUp() {
         user1 = userRepository.save(createUser("Peter", "peter@example.com"));
         user2 = userRepository.save(createUser("Kate", "kate@example.com"));
-        user3 = userRepository.save(createUser("Paul", "paul@example.com"));
+        User user3 = userRepository.save(createUser("Paul", "paul@example.com"));
 
-        item1 = itemRepository.save(createItem(user1, "Peter's Item 1",
+        Item item1 = itemRepository.save(createItem(user1, "Peter's Item 1",
                 "Peter's Item 1 Description"));
-        item2 = itemRepository.save(createItem(user1, "Peter's Item 2",
+        Item item2 = itemRepository.save(createItem(user1, "Peter's Item 2",
                 "Peter's Item 2 Description"));
-        item3 = itemRepository.save(createItem(user2, "Kate's Item 1",
-                "Kate's Item 1 Description"));
 
         booking1 = bookingRepository.save(createBooking(user2, item1,
                 LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(3)));

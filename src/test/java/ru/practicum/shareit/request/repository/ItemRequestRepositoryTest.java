@@ -23,31 +23,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ItemRequestRepositoryTest {
 
     @Autowired
-    ItemRequestRepository requestRepository;
+    private ItemRequestRepository requestRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "created");
 
     private static final Pageable DEFAULT_PAGEABLE = new CustomPageRequest(0, 10, DEFAULT_SORT);
 
+    private ItemRequest request1;
 
-    ItemRequest request1;
-    ItemRequest request2;
-    ItemRequest request3;
-    ItemRequest request4;
-    ItemRequest request5;
+    private ItemRequest request2;
 
-    User user1;
-    User user2;
-    User user3;
+    private ItemRequest request3;
+
+    private ItemRequest request4;
+
+    private ItemRequest request5;
+
 
     @BeforeEach
     void setUp() {
-        user1 = userRepository.save(createUser("Peter", "peter@example.com"));
-        user2 = userRepository.save(createUser("Kate", "kate@example.com"));
-        user3 = userRepository.save(createUser("Paul", "paul@example.com"));
+        User user1 = userRepository.save(createUser("Peter", "peter@example.com"));
+        User user2 = userRepository.save(createUser("Kate", "kate@example.com"));
+        User user3 = userRepository.save(createUser("Paul", "paul@example.com"));
 
         request1 = requestRepository.save(createRequest(user2,
                 "Kate's Item Request 1", LocalDateTime.now().minusDays(5)));

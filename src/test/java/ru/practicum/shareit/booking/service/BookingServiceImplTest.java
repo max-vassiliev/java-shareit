@@ -51,7 +51,7 @@ class BookingServiceImplTest {
     private ItemRepository itemRepository;
 
     @InjectMocks
-    BookingServiceImpl bookingService;
+    private BookingServiceImpl bookingService;
 
     @Spy
     private final BookingMapper bookingMapper = Mappers.getMapper(BookingMapper.class);
@@ -81,11 +81,7 @@ class BookingServiceImplTest {
         BookingDto outputDto = bookingService.create(inputDto);
 
         assertEquals(bookingId, outputDto.getId());
-        assertEquals(inputDto.getStart(), outputDto.getStart());
-        assertEquals(inputDto.getEnd(), outputDto.getEnd());
-        assertEquals(status, outputDto.getStatus());
-        assertEquals(inputDto.getBookerId(), outputDto.getBooker().getId());
-        assertEquals(inputDto.getItemId(), outputDto.getItem().getId());
+        checkFields(booking, outputDto);
     }
 
     @Test
@@ -206,11 +202,7 @@ class BookingServiceImplTest {
 
         assertEquals(bookingId, outputDto.getId());
         assertEquals(BookingState.APPROVED, outputDto.getStatus());
-        assertEquals(booking.getStart(), outputDto.getStart());
-        assertEquals(booking.getEnd(), outputDto.getEnd());
-        assertEquals(booking.getBooker().getId(), outputDto.getBooker().getId());
-        assertEquals(booking.getItem().getId(), outputDto.getItem().getId());
-        assertEquals(booking.getItem().getName(), outputDto.getItem().getName());
+        checkFields(booking, outputDto);
     }
 
     @Test
@@ -230,11 +222,7 @@ class BookingServiceImplTest {
 
         assertEquals(bookingId, outputDto.getId());
         assertEquals(BookingState.REJECTED, outputDto.getStatus());
-        assertEquals(booking.getStart(), outputDto.getStart());
-        assertEquals(booking.getEnd(), outputDto.getEnd());
-        assertEquals(booking.getBooker().getId(), outputDto.getBooker().getId());
-        assertEquals(booking.getItem().getId(), outputDto.getItem().getId());
-        assertEquals(booking.getItem().getName(), outputDto.getItem().getName());
+        checkFields(booking, outputDto);
     }
 
     @Test
@@ -334,12 +322,7 @@ class BookingServiceImplTest {
 
         BookingDto outputDto = bookingService.getById(bookingId, bookerId);
         assertEquals(bookingId, outputDto.getId());
-        assertEquals(booking.getStart(), outputDto.getStart());
-        assertEquals(booking.getEnd(), outputDto.getEnd());
-        assertEquals(booking.getStatus(), outputDto.getStatus());
-        assertEquals(bookerId, outputDto.getBooker().getId());
-        assertEquals(booking.getItem().getId(), outputDto.getItem().getId());
-        assertEquals(booking.getItem().getName(), outputDto.getItem().getName());
+        checkFields(booking, outputDto);
     }
 
     @Test
@@ -357,13 +340,9 @@ class BookingServiceImplTest {
         BookingDto outputDto = bookingService.getById(bookingId, ownerId);
 
         assertEquals(bookingId, outputDto.getId());
-        assertEquals(booking.getStart(), outputDto.getStart());
-        assertEquals(booking.getEnd(), outputDto.getEnd());
-        assertEquals(booking.getStatus(), outputDto.getStatus());
-        assertEquals(booking.getBooker().getId(), outputDto.getBooker().getId());
-        assertEquals(booking.getItem().getId(), outputDto.getItem().getId());
-        assertEquals(booking.getItem().getName(), outputDto.getItem().getName());
+        checkFields(booking, outputDto);
     }
+
 
     @Test
     void getById_whenBookingNotFound_thenEntityNotFoundExceptionThrown() {
@@ -423,27 +402,7 @@ class BookingServiceImplTest {
         List<BookingDto> outputDtos = bookingService.getAllByBookerId(bookerId, DEFAULT_STATE, DEFAULT_PAGEABLE);
 
         assertEquals(expectedCount, outputDtos.size());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
-        assertEquals(bookings.get(1).getId(), outputDtos.get(1).getId());
-        assertEquals(bookings.get(1).getStart(), outputDtos.get(1).getStart());
-        assertEquals(bookings.get(1).getEnd(), outputDtos.get(1).getEnd());
-        assertEquals(bookings.get(1).getStatus(), outputDtos.get(1).getStatus());
-        assertEquals(bookings.get(1).getBooker().getId(), outputDtos.get(1).getBooker().getId());
-        assertEquals(bookings.get(1).getItem().getId(), outputDtos.get(1).getItem().getId());
-        assertEquals(bookings.get(1).getItem().getName(), outputDtos.get(1).getItem().getName());
-        assertEquals(bookings.get(2).getId(), outputDtos.get(2).getId());
-        assertEquals(bookings.get(2).getStart(), outputDtos.get(2).getStart());
-        assertEquals(bookings.get(2).getEnd(), outputDtos.get(2).getEnd());
-        assertEquals(bookings.get(2).getStatus(), outputDtos.get(2).getStatus());
-        assertEquals(bookings.get(2).getBooker().getId(), outputDtos.get(2).getBooker().getId());
-        assertEquals(bookings.get(2).getItem().getId(), outputDtos.get(2).getItem().getId());
-        assertEquals(bookings.get(2).getItem().getName(), outputDtos.get(2).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -463,28 +422,9 @@ class BookingServiceImplTest {
         List<BookingDto> outputDtos = bookingService.getAllByBookerId(bookerId, state, DEFAULT_PAGEABLE);
 
         assertEquals(expectedCount, outputDtos.size());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
-        assertEquals(bookings.get(1).getId(), outputDtos.get(1).getId());
-        assertEquals(bookings.get(1).getStart(), outputDtos.get(1).getStart());
-        assertEquals(bookings.get(1).getEnd(), outputDtos.get(1).getEnd());
-        assertEquals(bookings.get(1).getStatus(), outputDtos.get(1).getStatus());
-        assertEquals(bookings.get(1).getBooker().getId(), outputDtos.get(1).getBooker().getId());
-        assertEquals(bookings.get(1).getItem().getId(), outputDtos.get(1).getItem().getId());
-        assertEquals(bookings.get(1).getItem().getName(), outputDtos.get(1).getItem().getName());
-        assertEquals(bookings.get(2).getId(), outputDtos.get(2).getId());
-        assertEquals(bookings.get(2).getStart(), outputDtos.get(2).getStart());
-        assertEquals(bookings.get(2).getEnd(), outputDtos.get(2).getEnd());
-        assertEquals(bookings.get(2).getStatus(), outputDtos.get(2).getStatus());
-        assertEquals(bookings.get(2).getBooker().getId(), outputDtos.get(2).getBooker().getId());
-        assertEquals(bookings.get(2).getItem().getId(), outputDtos.get(2).getItem().getId());
-        assertEquals(bookings.get(2).getItem().getName(), outputDtos.get(2).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
+
 
     @Test
     void getAllByBookerId_whenStateIsFuture_thenDtosWithFutureBookingsReturned() {
@@ -514,20 +454,7 @@ class BookingServiceImplTest {
         assertNotEquals(bookings.size(), outputDtos.size());
         assertTrue(outputDtos.get(0).getStart().isAfter(LocalDateTime.now()));
         assertTrue(outputDtos.get(1).getStart().isAfter(LocalDateTime.now()));
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
-        assertEquals(bookings.get(1).getId(), outputDtos.get(1).getId());
-        assertEquals(bookings.get(1).getStart(), outputDtos.get(1).getStart());
-        assertEquals(bookings.get(1).getEnd(), outputDtos.get(1).getEnd());
-        assertEquals(bookings.get(1).getStatus(), outputDtos.get(1).getStatus());
-        assertEquals(bookings.get(1).getBooker().getId(), outputDtos.get(1).getBooker().getId());
-        assertEquals(bookings.get(1).getItem().getId(), outputDtos.get(1).getItem().getId());
-        assertEquals(bookings.get(1).getItem().getName(), outputDtos.get(1).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -557,13 +484,7 @@ class BookingServiceImplTest {
         assertNotEquals(bookings.size(), outputDtos.size());
         assertTrue(outputDtos.get(0).getStart().isBefore(LocalDateTime.now()));
         assertTrue(outputDtos.get(0).getEnd().isAfter(LocalDateTime.now()));
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -594,13 +515,7 @@ class BookingServiceImplTest {
         assertNotEquals(bookings.size(), outputDtos.size());
         assertTrue(outputDtos.get(0).getStart().isBefore(LocalDateTime.now()));
         assertTrue(outputDtos.get(0).getEnd().isBefore(LocalDateTime.now()));
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -629,13 +544,7 @@ class BookingServiceImplTest {
         assertEquals(expectedCount, outputDtos.size());
         assertNotEquals(bookings.size(), outputDtos.size());
         assertEquals(BookingState.WAITING, bookings.get(0).getStatus());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -664,13 +573,7 @@ class BookingServiceImplTest {
         assertEquals(expectedCount, outputDtos.size());
         assertNotEquals(bookings.size(), outputDtos.size());
         assertEquals(BookingState.REJECTED, bookings.get(0).getStatus());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -727,20 +630,7 @@ class BookingServiceImplTest {
         List<BookingDto> outputDtos = bookingService.getAllByOwnerId(ownerId, DEFAULT_STATE, DEFAULT_PAGEABLE);
 
         assertEquals(expectedCount, outputDtos.size());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
-        assertEquals(bookings.get(1).getId(), outputDtos.get(1).getId());
-        assertEquals(bookings.get(1).getStart(), outputDtos.get(1).getStart());
-        assertEquals(bookings.get(1).getEnd(), outputDtos.get(1).getEnd());
-        assertEquals(bookings.get(1).getStatus(), outputDtos.get(1).getStatus());
-        assertEquals(bookings.get(1).getBooker().getId(), outputDtos.get(1).getBooker().getId());
-        assertEquals(bookings.get(1).getItem().getId(), outputDtos.get(1).getItem().getId());
-        assertEquals(bookings.get(1).getItem().getName(), outputDtos.get(1).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -774,20 +664,7 @@ class BookingServiceImplTest {
         List<BookingDto> outputDtos = bookingService.getAllByOwnerId(ownerId, state, DEFAULT_PAGEABLE);
 
         assertEquals(expectedCount, outputDtos.size());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
-        assertEquals(bookings.get(1).getId(), outputDtos.get(1).getId());
-        assertEquals(bookings.get(1).getStart(), outputDtos.get(1).getStart());
-        assertEquals(bookings.get(1).getEnd(), outputDtos.get(1).getEnd());
-        assertEquals(bookings.get(1).getStatus(), outputDtos.get(1).getStatus());
-        assertEquals(bookings.get(1).getBooker().getId(), outputDtos.get(1).getBooker().getId());
-        assertEquals(bookings.get(1).getItem().getId(), outputDtos.get(1).getItem().getId());
-        assertEquals(bookings.get(1).getItem().getName(), outputDtos.get(1).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -817,13 +694,7 @@ class BookingServiceImplTest {
         assertEquals(expectedCount, outputDtos.size());
         assertNotEquals(bookings.size(), outputDtos.size());
         assertTrue(outputDtos.get(0).getStart().isAfter(LocalDateTime.now()));
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -853,13 +724,7 @@ class BookingServiceImplTest {
         assertNotEquals(bookings.size(), outputDtos.size());
         assertTrue(outputDtos.get(0).getStart().isBefore(LocalDateTime.now()));
         assertTrue(outputDtos.get(0).getEnd().isAfter(LocalDateTime.now()));
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -890,13 +755,7 @@ class BookingServiceImplTest {
         assertNotEquals(bookings.size(), outputDtos.size());
         assertTrue(outputDtos.get(0).getStart().isBefore(LocalDateTime.now()));
         assertTrue(outputDtos.get(0).getEnd().isBefore(LocalDateTime.now()));
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -925,13 +784,7 @@ class BookingServiceImplTest {
         assertEquals(expectedCount, outputDtos.size());
         assertNotEquals(bookings.size(), outputDtos.size());
         assertEquals(BookingState.WAITING, outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -960,13 +813,7 @@ class BookingServiceImplTest {
         assertEquals(expectedCount, outputDtos.size());
         assertNotEquals(bookings.size(), outputDtos.size());
         assertEquals(BookingState.REJECTED, outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getId(), outputDtos.get(0).getId());
-        assertEquals(bookings.get(0).getStart(), outputDtos.get(0).getStart());
-        assertEquals(bookings.get(0).getEnd(), outputDtos.get(0).getEnd());
-        assertEquals(bookings.get(0).getStatus(), outputDtos.get(0).getStatus());
-        assertEquals(bookings.get(0).getBooker().getId(), outputDtos.get(0).getBooker().getId());
-        assertEquals(bookings.get(0).getItem().getId(), outputDtos.get(0).getItem().getId());
-        assertEquals(bookings.get(0).getItem().getName(), outputDtos.get(0).getItem().getName());
+        checkFields(bookings, outputDtos);
     }
 
     @Test
@@ -994,9 +841,30 @@ class BookingServiceImplTest {
     }
 
 
-    // ----------
-    // Шаблоны
-    // ----------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
+
+    private void checkFields(Booking booking, BookingDto bookingDto) {
+        assertEquals(booking.getStart(), bookingDto.getStart());
+        assertEquals(booking.getEnd(), bookingDto.getEnd());
+        assertEquals(booking.getStatus(), bookingDto.getStatus());
+        assertEquals(booking.getBooker().getId(), bookingDto.getBooker().getId());
+        assertEquals(booking.getItem().getId(), bookingDto.getItem().getId());
+        assertEquals(booking.getItem().getName(), bookingDto.getItem().getName());
+    }
+
+    private void checkFields(List<Booking> bookings, List<BookingDto> bookingDtos) {
+        for (int i = 0; i < bookingDtos.size(); i++) {
+            assertEquals(bookings.get(i).getId(), bookingDtos.get(i).getId());
+            assertEquals(bookings.get(i).getStart(), bookingDtos.get(i).getStart());
+            assertEquals(bookings.get(i).getEnd(), bookingDtos.get(i).getEnd());
+            assertEquals(bookings.get(i).getStatus(), bookingDtos.get(i).getStatus());
+            assertEquals(bookings.get(i).getBooker().getId(), bookingDtos.get(i).getBooker().getId());
+            assertEquals(bookings.get(i).getItem().getId(), bookingDtos.get(i).getItem().getId());
+            assertEquals(bookings.get(i).getItem().getName(), bookingDtos.get(i).getItem().getName());
+        }
+    }
 
     private Booking createBooking(Long id, BookingDto bookingDto, Item item, User booker, BookingState status) {
         Booking booking = new Booking();

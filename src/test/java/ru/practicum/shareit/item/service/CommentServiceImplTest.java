@@ -55,7 +55,7 @@ class CommentServiceImplTest {
     private BookingRepository bookingRepository;
 
     @InjectMocks
-    CommentServiceImpl commentService;
+    private CommentServiceImpl commentService;
 
     @Spy
     private final CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);

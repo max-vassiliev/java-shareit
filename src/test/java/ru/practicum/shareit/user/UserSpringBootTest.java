@@ -39,24 +39,20 @@ class UserSpringBootTest {
     @Autowired
     private MockMvc mvc;
 
-    User user1;
-    User user2;
-    User user3;
+    private User user1;
+
+    private User user2;
+
+    private User user3;
 
 
     @BeforeEach
     public void setUp() {
-        userRepository.deleteAll();
         user1 = userRepository.save(createUser("Peter", "peter@example.com"));
         user2 = userRepository.save(createUser("Kate", "kate@example.com"));
         user3 = userRepository.save(createUser("Paul", "paul@example.com"));
     }
 
-
-
-    // --------
-    // Тесты
-    // --------
 
     @Test
     @SneakyThrows

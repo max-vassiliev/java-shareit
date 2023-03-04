@@ -27,19 +27,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Spy
     private UserMapper mapper = Mappers.getMapper(UserMapper.class);
 
     @InjectMocks
-    UserServiceImpl userService;
+    private UserServiceImpl userService;
 
 
     @Test
@@ -51,10 +54,7 @@ class UserServiceImplTest {
                 .thenReturn(savedUser);
 
         UserDto outputDto = userService.create(inputDto);
-
-        assertEquals(outputDto.getId(), savedUser.getId());
-        assertEquals(outputDto.getName(), savedUser.getName());
-        assertEquals(outputDto.getEmail(), savedUser.getEmail());
+        checkFields(savedUser, outputDto);
     }
 
     @Test
@@ -79,9 +79,7 @@ class UserServiceImplTest {
 
         UserDto outputDto = userService.update(inputDto);
 
-        assertEquals(outputDto.getId(), updatedUser.getId());
-        assertEquals(outputDto.getName(), updatedUser.getName());
-        assertEquals(outputDto.getEmail(), updatedUser.getEmail());
+        checkFields(updatedUser, outputDto);
     }
 
     @Test
@@ -142,9 +140,8 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(foundUser));
 
         UserDto actualOutputDto = userService.getById(userId);
-        assertEquals(actualOutputDto.getId(), expectedOutputDto.getId());
-        assertEquals(actualOutputDto.getName(), expectedOutputDto.getName());
-        assertEquals(actualOutputDto.getEmail(), expectedOutputDto.getEmail());
+
+        checkFields(expectedOutputDto, actualOutputDto);
     }
 
     @Test
@@ -170,15 +167,7 @@ class UserServiceImplTest {
 
         List<UserDto> foundUsersDtos = userService.getAll(defaultPageable);
         assertEquals(foundUsersDtos.size(), users.size());
-        assertEquals(foundUsersDtos.get(0).getId(), users.get(0).getId());
-        assertEquals(foundUsersDtos.get(0).getName(), users.get(0).getName());
-        assertEquals(foundUsersDtos.get(0).getEmail(), users.get(0).getEmail());
-        assertEquals(foundUsersDtos.get(1).getId(), users.get(1).getId());
-        assertEquals(foundUsersDtos.get(1).getName(), users.get(1).getName());
-        assertEquals(foundUsersDtos.get(1).getEmail(), users.get(1).getEmail());
-        assertEquals(foundUsersDtos.get(2).getId(), users.get(2).getId());
-        assertEquals(foundUsersDtos.get(2).getName(), users.get(2).getName());
-        assertEquals(foundUsersDtos.get(2).getEmail(), users.get(2).getEmail());
+        checkFields(users, foundUsersDtos);
     }
 
     @Test
@@ -189,9 +178,30 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).deleteById(any());
     }
 
-    // ----------
-    // Шаблоны
-    // ----------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
+
+    private void checkFields(User user, UserDto userDto) {
+        assertEquals(user.getId(), userDto.getId());
+        assertEquals(user.getName(), userDto.getName());
+        assertEquals(user.getEmail(), userDto.getEmail());
+    }
+
+    private void checkFields(List<User> users, List<UserDto> userDtos) {
+        for (int i = 0; i < userDtos.size(); i++) {
+            assertEquals(users.get(i).getId(), userDtos.get(i).getId());
+            assertEquals(users.get(i).getName(), userDtos.get(i).getName());
+            assertEquals(users.get(i).getEmail(), userDtos.get(i).getEmail());
+        }
+    }
+
+    private void checkFields(UserDto expectedDto, UserDto actualDto) {
+        assertEquals(expectedDto.getId(), actualDto.getId());
+        assertEquals(expectedDto.getName(), actualDto.getName());
+        assertEquals(expectedDto.getEmail(), actualDto.getEmail());
+    }
+
 
     private UserDto createUserDto() {
         UserDto dto = new UserDto();

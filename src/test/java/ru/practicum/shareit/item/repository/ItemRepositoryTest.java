@@ -25,46 +25,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ItemRepositoryTest {
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ItemRequestRepository requestRepository;
+    private ItemRequestRepository requestRepository;
 
     private static final Pageable DEFAULT_PAGEABLE = new CustomPageRequest(0, 10, Sort.by("id"));
 
-    Item user1Item1;
-    Item user1Item2;
-    Item user1Item3;
-    Item user2Item1;
-    Item user2Item2;
-    User user1;
-    User user2;
-    User user3;
-    ItemRequest request1;
-    ItemRequest request2;
+    private User user1;
+
+    private Item user2Item2;
+
+    private ItemRequest request1;
+
+    private ItemRequest request2;
 
 
     @BeforeEach
     public void setUp() {
         user1 = userRepository.save(createUser("Peter", "peter@example.com"));
-        user2 = userRepository.save(createUser("Kate", "kate@example.com"));
-        user3 = userRepository.save(createUser("Paul", "paul@example.com"));
+        User user2 = userRepository.save(createUser("Kate", "kate@example.com"));
+        User user3 = userRepository.save(createUser("Paul", "paul@example.com"));
 
         request1 = requestRepository.save(createItemRequest("Item Request 1",
                 user2, LocalDateTime.now().minusDays(2)));
         request2 = requestRepository.save(createItemRequest("Item Request 2",
                 user3, LocalDateTime.now().minusDays(1)));
 
-        user1Item1 = itemRepository.save(createItem("Peter's Item 1",
+        itemRepository.save(createItem("Peter's Item 1",
                 "Peter's Item 1 Description", user1, null));
-        user1Item2 = itemRepository.save(createItem("Peter's Item 2",
+        itemRepository.save(createItem("Peter's Item 2",
                 "Peter's Item 2 Description (keyword)", user1, null));
-        user1Item3 = itemRepository.save(createItem("Peter's Item 3 (keyword)",
+        itemRepository.save(createItem("Peter's Item 3 (keyword)",
                 "Peter's Item 3 Description", user1, request1));
-        user2Item1 = itemRepository.save(createItem("Kate's Item 1",
+        itemRepository.save(createItem("Kate's Item 1",
                 "Kate's Item 1 Description", user2, request2));
         user2Item2 = itemRepository.save(createItem("Kate's Item 2",
                 "Kate's Item 2 Description (keyword)", user2, null));

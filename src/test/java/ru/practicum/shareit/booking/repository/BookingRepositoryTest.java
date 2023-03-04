@@ -30,37 +30,42 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BookingRepositoryTest {
 
     @Autowired
-    BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
 
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "start");
 
     private static final Pageable DEFAULT_PAGEABLE = new CustomPageRequest(0, 10, DEFAULT_SORT);
 
-    Booking booking1;
-    Booking booking2;
-    Booking booking3;
-    Booking booking4;
+    private Booking booking1;
 
-    User user1;
-    User user2;
-    User user3;
+    private Booking booking2;
 
-    Item item1;
-    Item item2;
-    Item item3;
+    private Booking booking3;
+
+    private Booking booking4;
+
+    private User user1;
+
+    private User user2;
+
+    private Item item1;
+
+    private Item item2;
+
+    private Item item3;
 
 
     @BeforeEach
     public void setUp() {
         user1 = userRepository.save(createUser("Peter", "peter@example.com"));
         user2 = userRepository.save(createUser("Kate", "kate@example.com"));
-        user3 = userRepository.save(createUser("Paul", "paul@example.com"));
+        User user3 = userRepository.save(createUser("Paul", "paul@example.com"));
 
         item1 = itemRepository.save(createItem(user1, "Peter's Item 1",
                 "Peter's Item 1 Description"));

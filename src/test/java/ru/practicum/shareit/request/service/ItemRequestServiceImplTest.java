@@ -53,7 +53,7 @@ class ItemRequestServiceImplTest {
     private ItemRepository itemRepository;
 
     @InjectMocks
-    ItemRequestServiceImpl requestService;
+    private ItemRequestServiceImpl requestService;
 
     @Spy
     private ItemRequestMapper requestMapper = Mappers.getMapper(ItemRequestMapper.class);
@@ -131,15 +131,9 @@ class ItemRequestServiceImplTest {
 
         ItemRequestDto outputDto = requestService.getById(requestId, userId);
         assertEquals(requestId, outputDto.getId());
-        assert request != null;
-        assertEquals(request.getDescription(), outputDto.getDescription());
-        assertEquals(request.getCreated(), outputDto.getCreated());
         assertEquals(expectedItems, outputDto.getItems().size());
-        assertEquals(item.getId(), outputDto.getItems().get(0).getId());
-        assertEquals(item.getName(), outputDto.getItems().get(0).getName());
-        assertEquals(item.getDescription(), outputDto.getItems().get(0).getDescription());
-        assertEquals(item.getIsAvailable(), outputDto.getItems().get(0).getAvailable());
-        assertEquals(item.getRequest().getId(), outputDto.getItems().get(0).getRequestId());
+        if (request != null) checkFields(request, outputDto);
+        checkFields(item, outputDto);
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -166,9 +160,8 @@ class ItemRequestServiceImplTest {
 
         ItemRequestDto outputDto = requestService.getById(requestId, userId);
         assertEquals(requestId, outputDto.getId());
-        assertEquals(request.getDescription(), outputDto.getDescription());
-        assertEquals(request.getCreated(), outputDto.getCreated());
         assertEquals(expectedItems, outputDto.getItems().size());
+        checkFields(request, outputDto);
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -194,8 +187,7 @@ class ItemRequestServiceImplTest {
 
         ItemRequestDto outputDto = requestService.getById(requestId, userId);
         assertEquals(requestId, outputDto.getId());
-        assertEquals(request.getDescription(), outputDto.getDescription());
-        assertEquals(request.getCreated(), outputDto.getCreated());
+        checkFields(request, outputDto);
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -270,19 +262,11 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDto> outputDtos = requestService.getAllByRequestorId(requestorId);
 
         assertEquals(expectedRequests, outputDtos.size());
-        assertEquals(request1.getId(), outputDtos.get(0).getId());
-        assertEquals(request1.getDescription(), outputDtos.get(0).getDescription());
-        assertEquals(request1.getCreated(), outputDtos.get(0).getCreated());
         assertEquals(expectedItemsRequest1, outputDtos.get(0).getItems().size());
-        assertEquals(item.getId(), outputDtos.get(0).getItems().get(0).getId());
-        assertEquals(item.getName(), outputDtos.get(0).getItems().get(0).getName());
-        assertEquals(item.getDescription(), outputDtos.get(0).getItems().get(0).getDescription());
-        assertEquals(item.getIsAvailable(), outputDtos.get(0).getItems().get(0).getAvailable());
-        assertEquals(item.getRequest().getId(), outputDtos.get(0).getItems().get(0).getRequestId());
-        assertEquals(request2.getId(), outputDtos.get(1).getId());
-        assertEquals(request2.getDescription(), outputDtos.get(1).getDescription());
-        assertEquals(request2.getCreated(), outputDtos.get(1).getCreated());
         assertEquals(expectedItemsRequest2, outputDtos.get(1).getItems().size());
+        checkFields(request1, outputDtos.get(0));
+        checkFields(request2, outputDtos.get(1));
+        checkFields(item, outputDtos.get(0));
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -291,7 +275,7 @@ class ItemRequestServiceImplTest {
         verify(itemRepository, times(1))
                 .findAllByRequestIds(anyList());
     }
-
+    
     @Test
     void getAllByRequestorId_whenValidAndRequestsWithoutItems_thenDtosWithoutItemsReturned() {
         int expectedRequests = 2;
@@ -312,14 +296,10 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDto> outputDtos = requestService.getAllByRequestorId(requestorId);
 
         assertEquals(expectedRequests, outputDtos.size());
-        assertEquals(request1.getId(), outputDtos.get(0).getId());
-        assertEquals(request1.getDescription(), outputDtos.get(0).getDescription());
-        assertEquals(request1.getCreated(), outputDtos.get(0).getCreated());
         assertEquals(expectedItems, outputDtos.get(0).getItems().size());
-        assertEquals(request2.getId(), outputDtos.get(1).getId());
-        assertEquals(request2.getDescription(), outputDtos.get(1).getDescription());
-        assertEquals(request2.getCreated(), outputDtos.get(1).getCreated());
         assertEquals(expectedItems, outputDtos.get(1).getItems().size());
+        checkFields(request1, outputDtos.get(0));
+        checkFields(request2, outputDtos.get(1));
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -328,6 +308,7 @@ class ItemRequestServiceImplTest {
         verify(itemRepository, times(1))
                 .findAllByRequestIds(anyList());
     }
+
 
     @Test
     void getAllByRequestorId_whenValidAndNoRequests_thenEmptyListReturned() {
@@ -414,19 +395,11 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDto> outputDtos = requestService.getAllByOtherUsers(userId, DEFAULT_PAGEABLE);
 
         assertEquals(expectedRequests, outputDtos.size());
-        assertEquals(request1.getId(), outputDtos.get(0).getId());
-        assertEquals(request1.getDescription(), outputDtos.get(0).getDescription());
-        assertEquals(request1.getCreated(), outputDtos.get(0).getCreated());
         assertEquals(expectedItemsRequest1, outputDtos.get(0).getItems().size());
-        assertEquals(item.getId(), outputDtos.get(0).getItems().get(0).getId());
-        assertEquals(item.getName(), outputDtos.get(0).getItems().get(0).getName());
-        assertEquals(item.getDescription(), outputDtos.get(0).getItems().get(0).getDescription());
-        assertEquals(item.getIsAvailable(), outputDtos.get(0).getItems().get(0).getAvailable());
-        assertEquals(item.getRequest().getId(), outputDtos.get(0).getItems().get(0).getRequestId());
-        assertEquals(request2.getId(), outputDtos.get(1).getId());
-        assertEquals(request2.getDescription(), outputDtos.get(1).getDescription());
-        assertEquals(request2.getCreated(), outputDtos.get(1).getCreated());
         assertEquals(expectedItemsRequest2, outputDtos.get(1).getItems().size());
+        checkFields(request1, outputDtos.get(0));
+        checkFields(request2, outputDtos.get(1));
+        checkFields(item, outputDtos.get(0));
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -458,14 +431,10 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDto> outputDtos = requestService.getAllByOtherUsers(userId, DEFAULT_PAGEABLE);
 
         assertEquals(expectedRequests, outputDtos.size());
-        assertEquals(request1.getId(), outputDtos.get(0).getId());
-        assertEquals(request1.getDescription(), outputDtos.get(0).getDescription());
-        assertEquals(request1.getCreated(), outputDtos.get(0).getCreated());
         assertEquals(expectedItems, outputDtos.get(0).getItems().size());
-        assertEquals(request2.getId(), outputDtos.get(1).getId());
-        assertEquals(request2.getDescription(), outputDtos.get(1).getDescription());
-        assertEquals(request2.getCreated(), outputDtos.get(1).getCreated());
         assertEquals(expectedItems, outputDtos.get(1).getItems().size());
+        checkFields(request1, outputDtos.get(0));
+        checkFields(request2, outputDtos.get(1));
 
         verify(userRepository, times(1))
                 .findById(isA(Long.class));
@@ -500,10 +469,23 @@ class ItemRequestServiceImplTest {
     }
 
 
-    // ----------
-    // Шаблоны
-    // ----------
+    // -------------------------
+    // Вспомогательные методы
+    // -------------------------
 
+    private void checkFields(ItemRequest request, ItemRequestDto requestDto) {
+        assertEquals(request.getId(), requestDto.getId());
+        assertEquals(request.getDescription(), requestDto.getDescription());
+        assertEquals(request.getCreated(), requestDto.getCreated());
+    }
+
+    private void checkFields(Item item, ItemRequestDto requestDto) {
+        assertEquals(item.getId(), requestDto.getItems().get(0).getId());
+        assertEquals(item.getName(), requestDto.getItems().get(0).getName());
+        assertEquals(item.getDescription(), requestDto.getItems().get(0).getDescription());
+        assertEquals(item.getIsAvailable(), requestDto.getItems().get(0).getAvailable());
+        assertEquals(item.getRequest().getId(), requestDto.getItems().get(0).getRequestId());
+    }
 
     private ItemRequestDto createInputDto(Long requestorId) {
         ItemRequestDto dto = new ItemRequestDto();

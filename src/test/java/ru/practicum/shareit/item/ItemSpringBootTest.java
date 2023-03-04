@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class ItemControllerSpringBootTest {
+class ItemSpringBootTest {
 
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
@@ -59,19 +59,23 @@ class ItemControllerSpringBootTest {
     @Autowired
     private MockMvc mvc;
 
-    Item user1Item1;
-    Item user1Item2;
-    Item user1Item3;
-    Item user2Item1;
-    Item user2Item2;
-    User user1;
-    User user2;
-    User user3;
-    ItemRequest request1;
-    ItemRequest request2;
-    Booking lastBookingItem1;
-    Booking nextBookingItem1;
-    Comment item1Comment;
+    private Item item1;
+
+    private Item item2;
+
+    private Item item3;
+
+    private Item item4;
+
+    private User peter;
+
+    private User paul;
+
+    private Booking lastBookingItem1;
+
+    private Booking nextBookingItem1;
+
+    private Comment item1Comment;
 
 
     @AfterEach
@@ -99,18 +103,18 @@ class ItemControllerSpringBootTest {
     void getAllByOwnerId_whenAllIs3AndDefaultPageable_then3ItemsReturned() {
         setUp();
         int expectedItems = 3;
-        Long ownerId = user1.getId();
+        Long ownerId = peter.getId();
 
         mvc.perform(get("/items")
                     .header(USER_ID_HEADER, ownerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(expectedItems)))
-                .andExpect(jsonPath("$[0].id", is(user1Item1.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", is(user1Item1.getName())))
-                .andExpect(jsonPath("$[0].description", is(user1Item1.getDescription())))
-                .andExpect(jsonPath("$[0].available", is(user1Item1.getIsAvailable())))
-                .andExpect(jsonPath("$[0].requestId", is(user1Item1.getRequest().getId()), Long.class))
+                .andExpect(jsonPath("$[0].id", is(item1.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", is(item1.getName())))
+                .andExpect(jsonPath("$[0].description", is(item1.getDescription())))
+                .andExpect(jsonPath("$[0].available", is(item1.getIsAvailable())))
+                .andExpect(jsonPath("$[0].requestId", is(item1.getRequest().getId()), Long.class))
                 .andExpect(jsonPath("$[0].lastBooking").isNotEmpty())
                 .andExpect(jsonPath("$[0].lastBooking.id",
                         is(lastBookingItem1.getId()), Long.class))
@@ -153,14 +157,14 @@ class ItemControllerSpringBootTest {
                         is(item1Comment.getAuthor().getName())))
                 .andExpect(jsonPath("$[0].comments[0].created",
                         is(item1Comment.getCreated().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))))
-                .andExpect(jsonPath("$[1].id", is(user1Item2.getId()), Long.class))
-                .andExpect(jsonPath("$[1].name", is(user1Item2.getName())))
-                .andExpect(jsonPath("$[1].description", is(user1Item2.getDescription())))
-                .andExpect(jsonPath("$[1].available", is(user1Item2.getIsAvailable())))
-                .andExpect(jsonPath("$[2].id", is(user1Item3.getId()), Long.class))
-                .andExpect(jsonPath("$[2].name", is(user1Item3.getName())))
-                .andExpect(jsonPath("$[2].description", is(user1Item3.getDescription())))
-                .andExpect(jsonPath("$[2].available", is(user1Item3.getIsAvailable())));
+                .andExpect(jsonPath("$[1].id", is(item2.getId()), Long.class))
+                .andExpect(jsonPath("$[1].name", is(item2.getName())))
+                .andExpect(jsonPath("$[1].description", is(item2.getDescription())))
+                .andExpect(jsonPath("$[1].available", is(item2.getIsAvailable())))
+                .andExpect(jsonPath("$[2].id", is(item3.getId()), Long.class))
+                .andExpect(jsonPath("$[2].name", is(item3.getName())))
+                .andExpect(jsonPath("$[2].description", is(item3.getDescription())))
+                .andExpect(jsonPath("$[2].available", is(item3.getIsAvailable())));
     }
 
     @Test
@@ -168,7 +172,7 @@ class ItemControllerSpringBootTest {
     void getAllByOwnerId_whenAllIs3FromIs1AndSizeIs1_thenListWith1ItemReturned() {
         setUp();
         int expectedItems = 1;
-        Long ownerId = user1.getId();
+        Long ownerId = peter.getId();
         String from = "1";
         String size = "1";
 
@@ -179,10 +183,10 @@ class ItemControllerSpringBootTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(expectedItems)))
-                .andExpect(jsonPath("$[0].id", is(user1Item2.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", is(user1Item2.getName())))
-                .andExpect(jsonPath("$[0].description", is(user1Item2.getDescription())))
-                .andExpect(jsonPath("$[0].available", is(user1Item2.getIsAvailable())));
+                .andExpect(jsonPath("$[0].id", is(item2.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", is(item2.getName())))
+                .andExpect(jsonPath("$[0].description", is(item2.getDescription())))
+                .andExpect(jsonPath("$[0].available", is(item2.getIsAvailable())));
     }
 
     @Test
@@ -191,25 +195,25 @@ class ItemControllerSpringBootTest {
         setUp();
         String keyword = "keYwOrd";
         int expectedItems = 3;
-        Long userId = user3.getId();
+        Long userId = paul.getId();
 
         mvc.perform(get("/items/search?text={text}", keyword)
                         .header(USER_ID_HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(expectedItems)))
-                .andExpect(jsonPath("$[0].id", is(user1Item1.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", is(user1Item1.getName())))
-                .andExpect(jsonPath("$[0].description", is(user1Item1.getDescription())))
-                .andExpect(jsonPath("$[0].available", is(user1Item1.getIsAvailable())))
-                .andExpect(jsonPath("$[1].id", is(user1Item3.getId()), Long.class))
-                .andExpect(jsonPath("$[1].name", is(user1Item3.getName())))
-                .andExpect(jsonPath("$[1].description", is(user1Item3.getDescription())))
-                .andExpect(jsonPath("$[1].available", is(user1Item3.getIsAvailable())))
-                .andExpect(jsonPath("$[2].id", is(user2Item2.getId()), Long.class))
-                .andExpect(jsonPath("$[2].name", is(user2Item2.getName())))
-                .andExpect(jsonPath("$[2].description", is(user2Item2.getDescription())))
-                .andExpect(jsonPath("$[2].available", is(user2Item2.getIsAvailable())));
+                .andExpect(jsonPath("$[0].id", is(item1.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", is(item1.getName())))
+                .andExpect(jsonPath("$[0].description", is(item1.getDescription())))
+                .andExpect(jsonPath("$[0].available", is(item1.getIsAvailable())))
+                .andExpect(jsonPath("$[1].id", is(item3.getId()), Long.class))
+                .andExpect(jsonPath("$[1].name", is(item3.getName())))
+                .andExpect(jsonPath("$[1].description", is(item3.getDescription())))
+                .andExpect(jsonPath("$[1].available", is(item3.getIsAvailable())))
+                .andExpect(jsonPath("$[2].id", is(item4.getId()), Long.class))
+                .andExpect(jsonPath("$[2].name", is(item4.getName())))
+                .andExpect(jsonPath("$[2].description", is(item4.getDescription())))
+                .andExpect(jsonPath("$[2].available", is(item4.getIsAvailable())));
     }
 
     @Test
@@ -218,22 +222,22 @@ class ItemControllerSpringBootTest {
         setUp();
         String keyword = "keYwOrd";
         int expectedItems = 2;
-        Long userId = user3.getId();
-        user2Item2.setIsAvailable(false);
+        Long userId = paul.getId();
+        item4.setIsAvailable(false);
 
         mvc.perform(get("/items/search?text={text}", keyword)
                         .header(USER_ID_HEADER, userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(expectedItems)))
-                .andExpect(jsonPath("$[0].id", is(user1Item1.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", is(user1Item1.getName())))
-                .andExpect(jsonPath("$[0].description", is(user1Item1.getDescription())))
-                .andExpect(jsonPath("$[0].available", is(user1Item1.getIsAvailable())))
-                .andExpect(jsonPath("$[1].id", is(user1Item3.getId()), Long.class))
-                .andExpect(jsonPath("$[1].name", is(user1Item3.getName())))
-                .andExpect(jsonPath("$[1].description", is(user1Item3.getDescription())))
-                .andExpect(jsonPath("$[1].available", is(user1Item3.getIsAvailable())));
+                .andExpect(jsonPath("$[0].id", is(item1.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", is(item1.getName())))
+                .andExpect(jsonPath("$[0].description", is(item1.getDescription())))
+                .andExpect(jsonPath("$[0].available", is(item1.getIsAvailable())))
+                .andExpect(jsonPath("$[1].id", is(item3.getId()), Long.class))
+                .andExpect(jsonPath("$[1].name", is(item3.getName())))
+                .andExpect(jsonPath("$[1].description", is(item3.getDescription())))
+                .andExpect(jsonPath("$[1].available", is(item3.getIsAvailable())));
     }
 
     @Test
@@ -244,7 +248,7 @@ class ItemControllerSpringBootTest {
         int expectedItems = 1;
         String from = "1";
         String size = "1";
-        Long userId = user3.getId();
+        Long userId = paul.getId();
 
         mvc.perform(get("/items/search?text={text}", keyword)
                         .header(USER_ID_HEADER, userId)
@@ -253,10 +257,10 @@ class ItemControllerSpringBootTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(expectedItems)))
-                .andExpect(jsonPath("$[0].id", is(user1Item3.getId()), Long.class))
-                .andExpect(jsonPath("$[0].name", is(user1Item3.getName())))
-                .andExpect(jsonPath("$[0].description", is(user1Item3.getDescription())))
-                .andExpect(jsonPath("$[0].available", is(user1Item3.getIsAvailable())));
+                .andExpect(jsonPath("$[0].id", is(item3.getId()), Long.class))
+                .andExpect(jsonPath("$[0].name", is(item3.getName())))
+                .andExpect(jsonPath("$[0].description", is(item3.getDescription())))
+                .andExpect(jsonPath("$[0].available", is(item3.getIsAvailable())));
     }
 
 
@@ -265,33 +269,29 @@ class ItemControllerSpringBootTest {
     // ----------
 
     public void setUp() {
-        user1 = userRepository.save(createUser("Peter", "peter@example.com"));
-        user2 = userRepository.save(createUser("Kate", "kate@example.com"));
-        user3 = userRepository.save(createUser("Paul", "paul@example.com"));
+        peter = userRepository.save(createUser("Peter", "peter@example.com"));
+        paul = userRepository.save(createUser("Paul", "paul@example.com"));
+        User kate = userRepository.save(createUser("Kate", "kate@example.com"));
 
-        request1 = requestRepository.save(createItemRequest("Item Request 1",
-                user2, LocalDateTime.now().minusDays(9)));
-        request2 = requestRepository.save(createItemRequest("Item Request 2",
-                user3, LocalDateTime.now().minusDays(7)));
+        ItemRequest request1 = requestRepository.save(createItemRequest(
+                kate, LocalDateTime.now().minusDays(9)));
 
-        user1Item1 = itemRepository.save(createItem("Peter's Item 1",
-                "Peter's Item 1 Description (keyword)", user1, request1));
-        user1Item2 = itemRepository.save(createItem("Peter's Item 2",
-                "Peter's Item 2 Description", user1, null));
-        user1Item3 = itemRepository.save(createItem("Peter's Item 3 (keyword)",
-                "Peter's Item 3 Description", user1, null));
-        user2Item1 = itemRepository.save(createItem("Kate's Item 1",
-                "Kate's Item 1 Description", user2, request2));
-        user2Item2 = itemRepository.save(createItem("Kate's Item 2",
-                "Kate's Item 2 Description (keyword)", user2, null));
+        item1 = itemRepository.save(createItem("Peter's Item 1",
+                "Peter's Item 1 Description (keyword)", peter, request1));
+        item2 = itemRepository.save(createItem("Peter's Item 2",
+                "Peter's Item 2 Description", peter, null));
+        item3 = itemRepository.save(createItem("Peter's Item 3 (keyword)",
+                "Peter's Item 3 Description", peter, null));
+        item4 = itemRepository.save(createItem("Kate's Item 2",
+                "Kate's Item 2 Description (keyword)", kate, null));
 
-        lastBookingItem1 = bookingRepository.save(createBooking(user2, user1Item1,
+        lastBookingItem1 = bookingRepository.save(createBooking(kate, item1,
                 LocalDateTime.now().minusDays(3), LocalDateTime.now().minusDays(1)));
-        nextBookingItem1 = bookingRepository.save(createBooking(user3, user1Item1,
+        nextBookingItem1 = bookingRepository.save(createBooking(paul, item1,
                 LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(3)));
 
         item1Comment = commentRepository.save(createComment(
-                user1Item1, user2, LocalDateTime.now().minusHours(4)));
+                item1, kate, LocalDateTime.now().minusHours(4)));
     }
 
     private Item createItem(String name, String description, User owner, ItemRequest request) {
@@ -311,9 +311,9 @@ class ItemControllerSpringBootTest {
         return user;
     }
 
-    private ItemRequest createItemRequest(String description, User requestor, LocalDateTime created) {
+    private ItemRequest createItemRequest(User requestor, LocalDateTime created) {
         ItemRequest request = new ItemRequest();
-        request.setDescription(description);
+        request.setDescription("Item Request 1");
         request.setRequestor(requestor);
         request.setCreated(created);
         return request;
