@@ -1,11 +1,12 @@
 package ru.practicum.shareit.user.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.shareit.util.Create;
-import ru.practicum.shareit.util.Update;
+import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.Update;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class UserDto {
 
@@ -27,10 +29,10 @@ public class UserDto {
 
 
     public static boolean isNameNotNull(UserDto userDto) {
-        return userDto.getName() != null && !userDto.getName().isBlank();
+        return userDto.getName() != null && !userDto.getName().isEmpty();
     }
 
     public static boolean isEmailNotNull(UserDto userDto) {
-        return userDto.getEmail() != null && !userDto.getEmail().isBlank();
+        return userDto.getEmail() != null && !userDto.getEmail().isEmpty();
     }
 }

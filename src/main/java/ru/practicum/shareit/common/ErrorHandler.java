@@ -1,4 +1,4 @@
-package ru.practicum.shareit.error;
+package ru.practicum.shareit.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,12 +7,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.error.exception.BookingStatusException;
-import ru.practicum.shareit.error.exception.ConflictException;
-import ru.practicum.shareit.error.exception.EntityNotFoundException;
-import ru.practicum.shareit.error.exception.ForbiddenException;
-import ru.practicum.shareit.error.exception.ValidationException;
-import ru.practicum.shareit.error.model.ErrorResponse;
+import ru.practicum.shareit.common.exception.BookingStatusException;
+import ru.practicum.shareit.common.exception.ConflictException;
+import ru.practicum.shareit.common.exception.EntityNotFoundException;
+import ru.practicum.shareit.common.exception.ForbiddenException;
+import ru.practicum.shareit.common.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
