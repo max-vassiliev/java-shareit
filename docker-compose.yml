@@ -9,7 +9,6 @@ services:
     depends_on:
       - server
     environment:
-      - TZ=Europe/Paris
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
@@ -21,10 +20,12 @@ services:
     depends_on:
       - db
     environment:
-      - TZ=Europe/Paris
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit-test
       - SPRING_DATASOURCE_USERNAME=shareit-adm
       - SPRING_DATASOURCE_PASSWORD=shareit-passkey
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
 
   db:
     image: postgres:14-alpine
@@ -32,7 +33,9 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - TZ=Europe/Paris
       - POSTGRES_DB=shareit-test
       - POSTGRES_USER=shareit-adm
       - POSTGRES_PASSWORD=shareit-passkey
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
